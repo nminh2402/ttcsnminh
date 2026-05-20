@@ -1,0 +1,327 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <title>Danh sách tất cả sách - PTIT ELIB</title>
+    <script src="{% static 'js/style.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  </head>
+  <body>
+    <header class="fixed-header">
+      <!-- Header Top -->
+      <div class="header-top">
+        <div>
+          <a href="#">VI</a> | <a href="#"> EN</a>
+          <a href="https://www.facebook.com/HocvienPTIT/?locale=vi_VN"><i class="lni lni-facebook"></i></a>
+          <a href="https://www.youtube.com/@PChannels"><i class="lni lni-youtube"></i></a>
+        </div>
+        <div>
+          <a href="https://ptit.edu.vn/">Cổng thông tin</a>
+        </div>
+      </div>
+      <!-- Header Bottom -->
+      <div class="header-bottom">
+        <div class="logo">
+          <img src="{% static 'images/download-logo-vector-hoc-vien-cong-nghe-buu-chinh-vien-thong-mien-phi.jpg' %}" alt="Logo">
+          <div>
+            <strong class="ten">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</strong><br />
+            <span>Posts and Telecommunications Institute of Technology</span>
+          </div>
+        </div>
+        <ul class="menu">
+          <li><a href="{% url 'home' %}">Trang chủ</a></li>
+          <li><a href="{% url 'intro' %}">Giới thiệu</a></li>
+          <li><a href="https://ptit.edu.vn/tin-tuc-su-kien/tin-tuc/tin-tuc-chung">Tin tức & Sự kiện</a></li>
+          {% if request.user.is_staff %}
+          <li>
+            <a href="{% url 'manage_books' %}" style="color:#8B0000;font-weight:700;background:rgba(139,0,0,.08);padding:4px 10px;border-radius:6px;">
+              ⚙️ Quản lý sách
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+        <ul class="auth-menu">
+          {% if request.user.is_authenticated %}
+            <li class="user-menu">
+              <div class="dropdown">
+                <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fas fa-user"></i>
+                  <span>{{ request.user }}</span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Thông tin cá nhân</a></li>
+                  <li><a class="dropdown-item" href="{% url 'borrowed_books' %}"><i class="fas fa-book"></i> Sách đã mượn</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+                </ul>
+              </div>
+            </li>
+          {% else %}
+            <li class="auth-links">
+              <a href="{% url 'login' %}" class="login-btn">Đăng Nhập</a>
+              <a href="{% url 'register' %}" class="register-btn">Đăng Ký</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+      <!-- Search Bar -->
+      <section class="search-section">
+        {% if request.user.is_authenticated %}
+          <form action="{% url 'search' %}" method="GET" style="display: flex; align-items: center; width: 100%;">
+            <select class="pick" name="category" style="margin-right: 10px;">
+              <option value="all">Tất cả</option>
+              <option value="book" selected>Sách</option>
+              <option value="giaotrinh">Giáo Trình</option>
+            </select>
+            <input class="timkiem" type="text" name="q" placeholder="Nhập từ khóa tìm kiếm" required>
+            <button class="search-button" type="submit">Tìm kiếm</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#imageModal">
+              <i class="fa fa-camera"></i>
+            </button>
+          </form>
+        {% else %}
+          <input class="timkiem" type="text" name="q" placeholder="Vui lòng đăng nhập để tìm kiếm" required>
+          <button class="search-button" onclick="window.location.href='{% url 'login' %}'">Tìm kiếm</button>
+        {% endif %}
+      </section>
+    </header>
+
+    <main style="display:block; padding-top:40px;">
+      <section class="favorite-books-section">
+        <div class="container">
+          <div class="section-title text-center mb-5">
+            <h2 style="color:red; font-weight:bold;">TẤT CẢ SÁCH TRONG THƯ VIỆN</h2>
+            <p class="text-muted">Khám phá {{ books|length }} cuốn sách hiện có</p>
+          </div>
+
+          <div class="row book-row">
+            {% for book in books %}
+            <div class="col-md-3 col-sm-6 mb-4">
+              <div class="book-item">
+                <div class="book-cover">
+                  {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }}">
+                  {% else %}
+                    <img src="{% static 'images/default-book-cover.jpg' %}" alt="{{ book.title }}">
+                  {% endif %}
+                  <div class="book-overlay">
+                    {% if book.quantity > 0 %}
+                      <button class="btn-view" onclick="openBorrowModal({{ book.id }}, this)">
+                        <i class="bi bi-book"></i> Mượn sách
+                      </button>
+                    {% else %}
+                      <button class="btn-view disabled" disabled>
+                        <i class="bi bi-book"></i> Hết sách
+                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="book-info">
+                  <h3>{{ book.title }}</h3>
+                  <p class="author">{{ book.author }}</p>
+                  <div class="rating">
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star"></i>
+                  </div>
+                  <a href="{% url 'book_detail' book.id %}" class="btn-detail-below">
+                    <i class="bi bi-eye"></i> Xem chi tiết
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-4">
+              <p style="color:#888;">Chưa có sách nào trong hệ thống.</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Borrow Modal -->
+    <div class="modal fade" id="borrowModal" tabindex="-1" aria-labelledby="borrowModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="borrowModalLabel">Thông tin mượn sách</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="borrowForm">
+              <input type="hidden" id="borrowBookId">
+              <div class="mb-3">
+                <label for="expectedReturnDate" class="form-label">Ngày dự kiến trả (*)</label>
+                <input type="date" class="form-control" id="expectedReturnDate" required>
+              </div>
+              <div class="mb-3">
+                <label for="borrowNote" class="form-label">Ghi chú thêm</label>
+                <textarea class="form-control" id="borrowNote" rows="3" placeholder="Mục đích mượn, tình trạng sách..."></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-primary" id="confirmBorrowBtn">Xác nhận mượn</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal tìm kiếm bằng ảnh -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-4 text-center">
+          <h5 class="modal-title mb-3">Tìm kiếm sách bằng ảnh bìa</h5>
+          <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{% url 'upload_cover' %}">
+            {% csrf_token %}
+            <input type="file" name="image" id="imageInput" accept="image/*" class="form-control mb-3" required>
+            <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+          </form>
+          <div id="resultArea" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <p class="thuvien">
+              <strong>TRUNG TÂM THÔNG TIN THƯ VIỆN – HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</strong>
+            </p>
+          </div>
+          <div class="col-4">
+            <div class="footer-column">
+              <p><strong>Trụ sở chính:</strong><br />122 Hoàng Quốc Việt, Q.Cầu Giấy, Hà Nội</p>
+              <p><strong>Cơ sở đào tạo tại Hà Nội:</strong><br />Km10, Đường Nguyễn Trãi, Q.Hà Đông, Hà Nội</p>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="footer-column">
+              <p><strong>Học viện cơ sở tại TP Hồ Chí Minh:</strong><br />11 Nguyễn Đình Chiểu, P.Đa Kao, Q.1 TP Hồ Chí Minh</p>
+              <p><strong>Cơ sở đào tạo tại TP Hồ Chí Minh:</strong><br />Đường Man Thiện, P.Hiệp Phú, Q.9 TP Hồ Chí Minh</p>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="map-container">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1862.6453264514646!2d105.78610757722628!3d20.980983103220105!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135accdd8a1ad71%3A0xa2f9b16036648187!2zSOG7jWMgdmnhu4duIEPDtG5nIG5naOG7hyBCxrB1IGNow61uaCB2aeG7hW4gdGjDtG5n!5e0!3m2!1svi!2s!4v1730383925525!5m2!1svi!2s"
+                style="border: 0" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      let currentBorrowButton = null;
+      function openBorrowModal(bookId, button) {
+        document.getElementById('borrowBookId').value = bookId;
+        document.getElementById('expectedReturnDate').value = '';
+        document.getElementById('borrowNote').value = '';
+        currentBorrowButton = button;
+        var borrowModal = new bootstrap.Modal(document.getElementById('borrowModal'));
+        borrowModal.show();
+      }
+      document.addEventListener('DOMContentLoaded', function() {
+        const confirmBtn = document.getElementById('confirmBorrowBtn');
+        if (confirmBtn) {
+          confirmBtn.addEventListener('click', function() {
+            const bookId = document.getElementById('borrowBookId').value;
+            const expectedDate = document.getElementById('expectedReturnDate').value;
+            const note = document.getElementById('borrowNote').value;
+            if (!expectedDate) {
+              alert("Vui lòng chọn ngày dự kiến trả!");
+              return;
+            }
+            fetch(`/book/${bookId}/borrow/`, {
+              method: 'POST',
+              headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                expected_return_date: expectedDate,
+                note: note
+              })
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                if (currentBorrowButton) {
+                  currentBorrowButton.outerHTML = `
+                    <button class="btn-view disabled" disabled>
+                      <i class="bi bi-book"></i> Đã Mượn
+                    </button>`;
+                }
+                var modalEl = document.getElementById('borrowModal');
+                var modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                alert("Mượn sách thành công!");
+              } else {
+                alert(data.message);
+              }
+            })
+            .catch(error => {
+              console.error('Lỗi:', error);
+              alert('Đã xảy ra lỗi khi mượn sách.');
+            });
+          });
+        }
+      });
+      document.getElementById("uploadForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData();
+        const fileInput = document.getElementById("imageInput");
+        if (!fileInput.files.length) return;
+        formData.append("image", fileInput.files[0]);
+        fetch("{% url 'upload_cover' %}", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+          },
+          body: formData
+        })
+        .then(res => res.text())
+        .then(html => {
+          document.getElementById("resultArea").innerHTML = html;
+        })
+        .catch(err => {
+          document.getElementById("resultArea").innerHTML = "Lỗi xử lý ảnh.";
+          console.error(err);
+        });
+      });
+    </script>
+  </body>
+</html>

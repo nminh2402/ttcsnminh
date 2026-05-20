@@ -1,0 +1,428 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <title>PTIT ELIB</title>
+    <link rel="stylesheet" href="{% static 'css/search.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  </head>
+  <body>
+    <!-- Header Top -->
+    <div class="header-top">
+      <div>
+        <a href="#">VI</a> | <a href="#"> EN</a>
+        <a href="https://www.facebook.com/HocvienPTIT/?locale=vi_VN"
+          ><i class="lni lni-facebook"></i
+        ></a>
+        <a href="https://www.youtube.com/@PChannels"
+          ><i class="lni lni-youtube"></i
+        ></a>
+      </div>
+      <div>
+        <a href="https://ptit.edu.vn/">Cổng thông tin</a>
+      </div>
+    </div>
+
+    <!-- Header Bottom -->
+    <div class="header-bottom">
+      <div class="logo">
+        <img src="{% static 'images/download-logo-vector-hoc-vien-cong-nghe-buu-chinh-vien-thong-mien-phi.jpg' %}" alt="Logo">
+        <div>
+          <strong class="ten">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</strong
+          ><br />
+          <span>Posts and Telecommunications Institute of Technology</span>
+        </div>
+      </div>
+      <ul class="menu">
+        <li><a href="{% url 'home' %}">Trang chủ</a></li>
+        <li>
+          <a href="#">Giới thiệu</a>
+        </li>
+        <li><a href="#">Tin tức & Sự kiện</a></li>
+        <li><a href="#">Liên hệ</a></li>
+        <li>
+          <a href="{% url 'logout' %}">Đăng Xuất</a>
+        </li>
+      </ul>
+    </div>
+
+    <section class="search-section">
+      {% if request.user.is_authenticated %}
+        <form action="{% url 'search' %}" method="GET" style="display: flex; align-items: center; width: 100%;">
+          
+          <select class="pick" name="category" style="margin-right: 10px;">
+            <option value="all" {% if category == 'all' %}selected{% endif %}>Tất cả</option>
+            <option value="book" {% if category == 'book' %}selected{% endif %}>Sách</option>
+            <option value="giaotrinh" {% if category == 'giaotrinh' %}selected{% endif %}>Giáo Trình</option>
+          </select>
+
+          <input class="timkiem" type="text" name="q" value="{{ query }}" placeholder="Nhập từ khóa tìm kiếm" required>
+          <button class="search-button" type="submit">Tìm kiếm</button>
+
+          <!-- Biểu tượng camera -->
+          <!-- Nút máy ảnh -->
+          <!-- Nút camera mở modal -->
+        
+        </form>
+      {% else %}
+        <input class="timkiem" type="text" name="q" placeholder="Vui lòng đăng nhập để tìm kiếm" required>
+        <button class="search-button" onclick="window.location.href='{% url 'login' %}'">Tìm kiếm</button>
+      {% endif %}
+    </section>
+
+
+{% if category == "book" or category == "all" %}
+  {% if books %}
+    <h5>Sách</h5>
+    <div class="result-list">
+      {% for book in books %}
+        <div class="result-item">
+          {% if book.image %}
+            <img src="{{ book.image.url }}" alt="Bìa sách {{ book.title }}">
+          {% else %}
+            <img src="{% static 'images/placeholder.png' %}" alt="Không có ảnh bìa">
+          {% endif %}
+          <div class="result-info">
+            <h4><a href="{% url 'book_detail' book.id %}">{{ book.title }}</a></h4>
+            <p><strong>Tác giả:</strong> {{ book.author }}</p>
+            <p><strong>Nhà xuất bản:</strong> {{ book.publisher }}</p>
+            {% if book.collection %}
+              <p><strong>Bộ sưu tập:</strong> {{ book.collection }}</p>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <h5>Không tìm thấy sách phù hợp.</h5>
+  {% endif %}
+{% endif %}
+
+{% if category == "giaotrinh" or category == "all" %}
+  {% if giaotrinhs %}
+    <h5>Giáo trình</h5>
+    <div class="result-list">
+      {% for giaotrinh in giaotrinhs %}
+        <div class="result-item">
+          {% if giaotrinh.image %}
+            <img src="{{ giaotrinh.image.url }}" alt="{{ giaotrinh.title }}">
+          {% else %}
+            <img src="{% static 'images/default-book.jpg' %}" alt="No image available">
+          {% endif %}
+          <div class="result-info">
+            <h4><a href="{% url 'giaotrinh_detail' giaotrinh.id %}">{{ giaotrinh.title }}</a></h4>
+            <p><strong>Tác giả:</strong> {{ giaotrinh.author }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <h5>Không tìm thấy giáo trình phù hợp.</h5>
+  {% endif %}
+{% endif %}
+
+  {% if recommended_books %}
+  <section class="recommended-books-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>SÁCH BẠN CÓ THỂ THÍCH</h2>
+      </div>
+      
+      <div class="book-slider-container">
+        <button class="slider-nav-btn prev-btn">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        
+        <div class="book-slider">
+          {% for book in recommended_books %}
+          <div class="book-item">
+            <div class="book-cover">
+              {% if book.image %}
+                  <img src="{{ book.image.url }}" alt="Bìa sách {{ book.title }}">
+              {% else %}
+                  <img src="{% static 'images/placeholder.png' %}" alt="Không có ảnh bìa">
+              {% endif %}
+              <div class="book-overlay">
+                <a href="{% url 'book_detail' book.id %}" class="btn-view">Xem chi tiết</a>
+                
+              </div>
+            </div>
+            <div class="book-info">
+              <h3>{{ book.title }}</h3>
+              <p class="author">{{ book.author }}</p>
+              <div class="rating">
+                {% for i in "12345" %}
+                  {% if i|add:"0" <= book.rating|add:"0" %}
+                    <i class="bi bi-star-fill"></i>
+                  {% elif i|add:"0" <= book.rating|add:"0.5" %}
+                    <i class="bi bi-star-half"></i>
+                  {% else %}
+                    <i class="bi bi-star"></i>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <button class="slider-nav-btn next-btn">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+      
+      <div class="slider-dots">
+        <!-- Dots will be populated by JavaScript -->
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+
+ <!-- Footer -->
+ <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <p class="thuvien">
+          <strong
+            >TRUNG TÂM THÔNG TIN THƯ VIỆN – HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN
+            THÔNG</strong
+          >
+        </p>
+      </div>
+      <div class="col-4">
+        <div class="footer-column">
+          <p>
+            <strong>Trụ sở chính:</strong><br />122 Hoàng Quốc Việt, Q.Cầu
+            Giấy, Hà Nội
+          </p>
+          <p>
+            <strong>Cơ sở đào tạo tại Hà Nội:</strong><br />Km10, Đường Nguyễn
+            Trãi, Q.Hà Đông, Hà Nội
+          </p>
+        </div>
+      </div>
+      <div class="col-4">
+        <div class="footer-column">
+          <p>
+            <strong>Học viện cơ sở tại TP Hồ Chí Minh:</strong><br />11 Nguyễn
+            Đình Chiểu, P.Đa Kao, Q.1 TP Hồ Chí Minh
+          </p>
+          <p>
+            <strong>Cơ sở đào tạo tại TP Hồ Chí Minh:</strong><br />Đường Man
+            Thiện, P.Hiệp Phú, Q.9 TP Hồ Chí Minh
+          </p>
+        </div>
+      </div>
+      <div class="col-4">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1862.6453264514646!2d105.78610757722628!3d20.980983103220105!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135accdd8a1ad71%3A0xa2f9b16036648187!2zSOG7jWMgdmnhu4duIEPDtG5nIG5naOG7hyBCxrB1IGNow61uaCB2aeG7hW4gdGjDtG5n!5e0!3m2!1svi!2s!4v1730383925525!5m2!1svi!2s"
+          width="300"
+          height="200"
+          style="border: 0"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        >
+        </iframe>
+      </div>
+    </div>
+  </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+      <style>
+        .search-results {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        
+        .result-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .result-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+        }
+        
+        .result-item img {
+            width: 100px;
+            height: 150px;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .result-info {
+            flex: 1;
+        }
+        
+        .result-info h4 a {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+        
+        .result-info p {
+            margin: 5px 0;
+            color: #555;
+        }
+    </style>
+  </body>
+</html>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize book slider functionality if it exists
+      const sliders = document.querySelectorAll('.book-slider');
+      
+      sliders.forEach(slider => {
+        const container = slider.closest('.book-slider-container');
+        if (!container) return;
+        
+        const prevBtn = container.querySelector('.prev-btn');
+        const nextBtn = container.querySelector('.next-btn');
+        const dotsContainer = container.parentElement.querySelector('.slider-dots');
+        
+        // Skip if elements not found
+        if (!prevBtn || !nextBtn || !dotsContainer) return;
+        
+        // Calculate dimensions
+        const bookWidth = slider.querySelector('.book-item').offsetWidth + 20; // width + gap
+        const visibleWidth = slider.offsetWidth;
+        const itemsPerPage = Math.floor(visibleWidth / bookWidth);
+        const totalItems = slider.querySelectorAll('.book-item').length;
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        
+        // Create dots
+        for (let i = 0; i < totalPages; i++) {
+          const dot = document.createElement('span');
+          dot.classList.add('dot');
+          if (i === 0) dot.classList.add('active');
+          dot.dataset.index = i;
+          dotsContainer.appendChild(dot);
+          
+          dot.addEventListener('click', () => {
+            currentPage = i;
+            updateSlider();
+          });
+        }
+        
+        let currentPage = 0;
+        
+        // Update slider to current page
+        function updateSlider() {
+          const scrollPosition = currentPage * visibleWidth;
+          slider.scrollLeft = scrollPosition;
+          
+          // Update dots
+          dotsContainer.querySelectorAll('.dot').forEach((dot, index) => {
+            if (index === currentPage) {
+              dot.classList.add('active');
+            } else {
+              dot.classList.remove('active');
+            }
+          });
+          
+          // Update button states
+          prevBtn.disabled = currentPage === 0;
+          prevBtn.style.opacity = currentPage === 0 ? '0.5' : '1';
+          
+          nextBtn.disabled = currentPage === totalPages - 1;
+          nextBtn.style.opacity = currentPage === totalPages - 1 ? '0.5' : '1';
+        }
+        
+        // Initial setup
+        updateSlider();
+        
+        // Button event listeners
+        prevBtn.addEventListener('click', () => {
+          if (currentPage > 0) {
+            currentPage--;
+            updateSlider();
+          }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+          if (currentPage < totalPages - 1) {
+            currentPage++;
+            updateSlider();
+          }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+          // Recalculate dimensions
+          const newBookWidth = slider.querySelector('.book-item').offsetWidth + 20;
+          const newVisibleWidth = slider.offsetWidth;
+          const newItemsPerPage = Math.floor(newVisibleWidth / newBookWidth);
+          const newTotalPages = Math.ceil(totalItems / newItemsPerPage);
+          
+          // Reset dots
+          dotsContainer.innerHTML = '';
+          for (let i = 0; i < newTotalPages; i++) {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (i === currentPage) dot.classList.add('active');
+            dot.dataset.index = i;
+            dotsContainer.appendChild(dot);
+            
+            dot.addEventListener('click', () => {
+              currentPage = i;
+              updateSlider();
+            });
+          }
+          
+          // Ensure current page is valid
+          if (currentPage >= newTotalPages) {
+            currentPage = newTotalPages - 1;
+          }
+          
+          // Update slider
+          updateSlider();
+        });
+      });
+    });
+    document.getElementById("uploadForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const formData = new FormData();
+  const fileInput = document.getElementById("imageInput");
+  if (!fileInput.files.length) return;
+
+  formData.append("image", fileInput.files[0]);
+
+  fetch("{% url 'upload_cover' %}", {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": "{{ csrf_token }}"
+    },
+    body: formData
+  })
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById("resultArea").innerHTML = html;
+  })
+  .catch(err => {
+    document.getElementById("resultArea").innerHTML = "Lỗi xử lý ảnh.";
+    console.error(err);
+  });
+});
+</script>

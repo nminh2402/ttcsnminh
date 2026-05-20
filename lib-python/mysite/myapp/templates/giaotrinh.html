@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <title>PTIT ELIB</title>
+    <link rel="stylesheet" href="{% static 'css/book.css' %}">
+  </head>
+  <body>
+    <!-- Header Top -->
+    <div class="header-top">
+      <div>
+        <a href="#">VI</a> | <a href="#"> EN</a>
+        <a href="https://www.facebook.com/HocvienPTIT/?locale=vi_VN"
+          ><i class="lni lni-facebook"></i
+        ></a>
+        <a href="https://www.youtube.com/@PChannels"
+          ><i class="lni lni-youtube"></i
+        ></a>
+      </div>
+      <div>
+        <a href="https://ptit.edu.vn/">Cổng thông tin</a>
+      </div>
+    </div>
+
+    <!-- Header Bottom -->
+    <div class="header-bottom">
+      <div class="logo">
+        <img  src="{% static 'images/download-logo-vector-hoc-vien-cong-nghe-buu-chinh-vien-thong-mien-phi.jpg' %}">
+        <div>
+          <strong class="ten">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</strong
+          ><br />
+          <span>Posts and Telecommunications Institute of Technology</span>
+        </div>
+      </div>
+      <ul class="menu">
+        <li><a href="{% url 'home' %}">Trang chủ </a></li>
+        <li>
+          <a href="#">Giới thiệu</a>
+        </li>
+        <li><a href="#">Tin tức & Sự kiện</a></li>
+        <li><a href="#">Liên hệ</a></li>
+        <li>
+          <a href="{% url 'logout' %}">Đăng Xuất</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- book information -->
+<h1 class="title1" style="margin-left: 120px; color: red;">{{ giaotrinh.title }}</h1>
+<div class="book">
+  <div class="document-info">
+    {% if giaotrinh.title %}
+      <div class="info-header">Thông tin giáo trình</div>
+      <div class="info-content">
+        <div class="image-container">
+          <img src="{{ giaotrinh.image.url }}" alt="{{ giaotrinh.title }}" />
+        </div>
+        <div class="details">
+          <p><strong>Title:</strong> {{ giaotrinh.title }}</p>
+          <p><strong>Authors:</strong> {{ giaotrinh.author }}</p>
+          <p><strong>URI:</strong> <a href="{{ giaotrinh.uri }}">{{ giaotrinh.uri }}</a></p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+    <!-- Footer -->
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <p class="thuvien">
+            <strong
+              >TRUNG TÂM THÔNG TIN THƯ VIỆN – HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN
+              THÔNG</strong
+            >
+          </p>
+        </div>
+        <div class="col-4">
+          <div class="footer-column">
+            <p>
+              <strong>Trụ sở chính:</strong><br />122 Hoàng Quốc Việt, Q.Cầu
+              Giấy, Hà Nội
+            </p>
+            <p>
+              <strong>Cơ sở đào tạo tại Hà Nội:</strong><br />Km10, Đường Nguyễn
+              Trãi, Q.Hà Đông, Hà Nội
+            </p>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="footer-column">
+            <p>
+              <strong>Học viện cơ sở tại TP Hồ Chí Minh:</strong><br />11 Nguyễn
+              Đình Chiểu, P.Đa Kao, Q.1 TP Hồ Chí Minh
+            </p>
+            <p>
+              <strong>Cơ sở đào tạo tại TP Hồ Chí Minh:</strong><br />Đường Man
+              Thiện, P.Hiệp Phú, Q.9 TP Hồ Chí Minh
+            </p>
+          </div>
+        </div>
+        <div class="col-4">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1862.6453264514646!2d105.78610757722628!3d20.980983103220105!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135accdd8a1ad71%3A0xa2f9b16036648187!2zSOG7jWMgdmnhu4duIEPDtG5nIG5naOG7hyBCxrB1IGNow61uaCB2aeG7hW4gdGjDtG5n!5e0!3m2!1svi!2s!4v1730383925525!5m2!1svi!2s"
+            width="300"
+            height="200"
+            style="border: 0"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          >
+          </iframe>
+        </div>
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
+<script>
+// Định nghĩa hàm getCookie để lấy CSRF token
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+// Hàm mượn sách
+function borrowBook(bookId, button) {
+  fetch(`/book/${bookId}/borrow/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({})
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      button.outerHTML = `
+        <button class="btn-view disabled" disabled>
+          <i class="bi bi-book"></i> Đã Mượn
+        </button>`;
+    } else {
+      alert(data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Lỗi:', error);
+    alert('Đã xảy ra lỗi khi mượn sách.');
+  });
+}
+</script>

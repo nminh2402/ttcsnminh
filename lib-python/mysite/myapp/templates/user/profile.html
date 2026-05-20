@@ -1,0 +1,386 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin người dùng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+    <style>
+        .book-slider-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            padding: 15px 0;
+            margin: 0 -5px;
+            cursor: grab;
+        }
+
+        .book-slider-container:active {
+            cursor: grabbing;
+        }
+
+        .book-slider {
+            display: flex;
+            transition: transform 0.3s ease;
+            gap: 12px;
+            padding: 5px;
+            user-select: none;
+        }
+
+        .book-card {
+            flex: 0 0 200px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 2;
+            font-size: 14px;
+            border: 1px solid #dee2e6;
+        }
+
+        .slider-nav.prev {
+            left: 5px;
+        }
+
+        .slider-nav.next {
+            right: 5px;
+        }
+
+        .slider-nav:hover {
+            background: #fff;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        }
+
+        .borrowed-book-card {
+            flex: 0 0 200px;
+            margin-right: 12px;
+        }
+
+        .book-cover-container {
+            width: 100%;
+            height: 120px;
+            overflow: hidden;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #f8f9fa;
+        }
+
+        .book-info {
+            font-size: 0.85rem;
+        }
+
+        .book-title {
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            line-height: 1.2;
+            height: 2.4em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .borrowed-book-info {
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        .info-label {
+            color: #6c757d;
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
+  <div class="header-top">
+      <div>
+        <a href="#">VI</a> | <a href="#"> EN</a>
+        <a href="https://www.facebook.com/HocvienPTIT/?locale=vi_VN"
+          ><i class="lni lni-facebook"></i
+        ></a>
+        <a href="https://www.youtube.com/@PChannels"
+          ><i class="lni lni-youtube"></i
+        ></a>
+      </div>
+      <div>
+        <a href="https://ptit.edu.vn/">Cổng thông tin</a>
+      </div>
+    </div>
+
+    <!-- Header Bottom -->
+    <div class="header-bottom">
+      <div class="logo">
+        <img  src="{% static 'images/download-logo-vector-hoc-vien-cong-nghe-buu-chinh-vien-thong-mien-phi.jpg' %}">
+        <div>
+          <strong class="ten">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</strong
+          ><br />
+          <span>Posts and Telecommunications Institute of Technology</span>
+        </div>
+      </div>
+      <ul class="menu">
+        <li><a href="{% url 'home' %}">Trang chủ </a></li>
+        <li>
+          <a href="#">Giới thiệu</a>
+        </li>
+        <li><a href="#">Tin tức & Sự kiện</a></li>
+        <li><a href="#">Liên hệ</a></li>
+        <li>
+          <a href="{% url 'logout' %}">Đăng Xuất</a>
+        </li>
+      </ul>
+    </div>
+    <div class="profile-container">
+        <div class="profile-header">
+        </div>
+        
+        <div class="profile-content">
+            <div class="user-info">
+                <h2>Thông tin cá nhân</h2>
+                <ul>
+                    <li><strong>Họ tên:</strong> {{ user.first_name }} {{ user.last_name }}</li>
+                    <li><strong>Username:</strong> {{ user.username }}</li>
+                    <li><strong>Email:</strong> {{ user.email }}</li>
+                    <li><strong>Ngày tham gia:</strong> {{ user.date_joined|date:"d/m/Y H:i" }}</li>
+                </ul>
+                
+                <div class="action-buttons">
+                    <a href="{% url 'edit_profile' %}" class="btn btn-primary">Thay đổi thông tin</a>
+                    <a href="{% url 'change_password' %}" class="btn btn-outline">Đổi mật khẩu</a>
+                </div>
+            </div>
+            
+            <div class="book-history">
+                <h2>Lịch sử sách</h2>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="borrowed">Đang mượn</div>
+                    <div class="tab" data-tab="returned">Đã trả</div>
+                    <div class="tab" data-tab="viewed">Đã xem</div>
+                </div>
+                
+                <div id="borrowed" class="tab-content active">
+                    {% if borrowed_books %}
+                        <div class="book-slider-container">
+                            <div class="book-slider">
+                                {% for record in borrowed_books %}
+                                    {% if record.returned_at is None %}
+                                    <div class="card borrowed-book-card border-0 shadow-sm p-3" style="border-radius: 12px; background-color: #f8f9fa;">
+                                        <div class="book-cover-container">
+                                            {% if record.book.image %}
+                                            <img src="{{ record.book.image.url }}" alt="Bìa sách" class="book-cover">
+                                            {% else %}
+                                            <img src="{% static 'images/default-book-cover.jpg' %}" alt="Bìa sách mặc định" class="book-cover">
+                                            {% endif %}
+                                        </div>
+                                        <div class="book-info">
+                                            <h5 class="book-title">{{ record.book.title }}</h5>
+                                            <div class="borrowed-book-info mb-1">
+                                                <span class="info-label">Tác giả:</span>
+                                                <span class="info-value">{{ record.book.author }}</span>
+                                            </div>
+                                            <div class="borrowed-book-info mb-1">
+                                                <span class="info-label">Ngày mượn:</span>
+                                                <span class="info-value">{{ record.borrowed_at|date:"d/m/Y" }}</span>
+                                            </div>
+                                            {% if record.book.pdf_file %}
+                                            <a href="{{ record.book.pdf_file.url }}" target="_blank"
+                                               style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;
+                                                      padding:5px 10px;background:#8B0000;color:#fff;
+                                                      border-radius:6px;font-size:12px;font-weight:600;
+                                                      text-decoration:none;transition:opacity .2s;"
+                                               onmouseover="this.style.opacity='.85'"
+                                               onmouseout="this.style.opacity='1'">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                                     stroke="currentColor" stroke-width="2.5"
+                                                     stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                </svg>
+                                                Đọc PDF
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-secondary text-center" role="alert">
+                            <i class="bi bi-book"></i> Bạn chưa mượn quyển sách nào.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div id="returned" class="tab-content">
+                    {% if returned_books %}
+                        <div class="book-slider-container">
+                            <div class="book-slider">
+                                {% for record in returned_books %}
+                                <div class="card borrowed-book-card border-0 shadow-sm p-3" style="border-radius: 12px; background-color: #f8f9fa;">
+                                    <div class="book-cover-container">
+                                        {% if record.book.image %}
+                                        <img src="{{ record.book.image.url }}" alt="Bìa sách" class="book-cover">
+                                        {% else %}
+                                        <img src="{% static 'images/default-book-cover.jpg' %}" alt="Bìa sách mặc định" class="book-cover">
+                                        {% endif %}
+                                    </div>
+                                    <div class="book-info">
+                                        <h5 class="book-title">{{ record.book.title }}</h5>
+                                        <div class="borrowed-book-info mb-1">
+                                            <span class="info-label">Tác giả:</span>
+                                            <span class="info-value">{{ record.book.author }}</span>
+                                        </div>
+                                        <div class="borrowed-book-info mb-1">
+                                            <span class="info-label">Ngày mượn:</span>
+                                            <span class="info-value">{{ record.borrowed_at|date:"d/m/Y" }}</span>
+                                        </div>
+                                        <div class="borrowed-book-info mb-1">
+                                            <span class="info-label">Ngày trả:</span>
+                                            <span class="info-value">{{ record.returned_at|date:"d/m/Y" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-secondary text-center" role="alert">
+                            <i class="bi bi-book"></i> Bạn chưa trả sách nào.
+                        </div>
+                    {% endif %}
+                </div>
+
+                
+                <div id="viewed" class="tab-content">
+                    {% if viewed_books %}
+                        {% for book in viewed_books %}
+                        <div class="book-card">
+                            <div class="book-cover">
+                                {% if book.cover_image %}
+                                    <img src="{{ book.cover_image.url }}" alt="{{ book.title }}" style="width:100%; height:100%; object-fit:cover;">
+                                {% else %}
+                                    <span>No Image</span>
+                                {% endif %}
+                            </div>
+                            <div class="book-details">
+                                <h3 class="book-title">{{ book.title }}</h3>
+                                <div class="book-meta">
+                                    <span>Tác giả: {{ book.author }}</span> | 
+                                    <span>Lần xem cuối: {{ book.last_viewed|date:"d/m/Y H:i" }}</span>
+                                </div>
+                                <span class="book-status status-viewed">Đã xem</span>
+                                <p class="book-description">{{ book.description|truncatewords:30 }}</p>
+                                <a href="{% url 'book_detail' book.id %}" class="btn btn-outline" style="margin-top:10px;">Xem lại</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-books">
+                            <p>Chưa có sách đã xem</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // Slider drag functionality
+            const sliders = document.querySelectorAll('.book-slider-container');
+            sliders.forEach(slider => {
+                const sliderContent = slider.querySelector('.book-slider');
+                let isDown = false;
+                let startX;
+                let scrollLeft;
+                const cardWidth = 212; // card width + gap (200px + 12px)
+
+                slider.addEventListener('mousedown', (e) => {
+                    isDown = true;
+                    slider.style.cursor = 'grabbing';
+                    startX = e.pageX - slider.offsetLeft;
+                    scrollLeft = sliderContent.scrollLeft;
+                });
+
+                slider.addEventListener('mouseleave', () => {
+                    isDown = false;
+                    slider.style.cursor = 'grab';
+                });
+
+                slider.addEventListener('mouseup', () => {
+                    isDown = false;
+                    slider.style.cursor = 'grab';
+                });
+
+                slider.addEventListener('mousemove', (e) => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - slider.offsetLeft;
+                    const walk = (x - startX) * 2; // Scroll speed multiplier
+                    sliderContent.style.transform = `translateX(${walk}px)`;
+                });
+
+                // Touch events for mobile
+                slider.addEventListener('touchstart', (e) => {
+                    isDown = true;
+                    startX = e.touches[0].pageX - slider.offsetLeft;
+                    scrollLeft = sliderContent.scrollLeft;
+                });
+
+                slider.addEventListener('touchend', () => {
+                    isDown = false;
+                });
+
+                slider.addEventListener('touchmove', (e) => {
+                    if (!isDown) return;
+                    const x = e.touches[0].pageX - slider.offsetLeft;
+                    const walk = (x - startX) * 2;
+                    sliderContent.style.transform = `translateX(${walk}px)`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

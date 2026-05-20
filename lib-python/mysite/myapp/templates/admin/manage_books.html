@@ -1,0 +1,375 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản lý sách – PTIT Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Roboto',sans-serif;background:#f0f2f5;min-height:100vh}
+
+    /* HEADER */
+    .header-top{background:#8B0000;color:#fff;padding:6px 40px;display:flex;justify-content:space-between;font-size:13px}
+    .header-top a{color:#fff;text-decoration:none;margin:0 4px}
+    .header-bottom{background:#fff;padding:12px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #8B0000;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo img{height:50px}
+    .logo .ten{color:#8B0000;font-size:14px;font-weight:700}
+    .logo span{font-size:12px;color:#555}
+    .menu{list-style:none;display:flex;gap:22px}
+    .menu a{text-decoration:none;color:#333;font-size:14px;font-weight:500;transition:color .2s}
+    .menu a:hover{color:#8B0000}
+
+    /* PAGE */
+    .page{max-width:1200px;margin:36px auto;padding:0 24px}
+    .page-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .page-title h1{font-size:22px;font-weight:700;color:#1a1a2e}
+    .page-title h1 span{color:#8B0000}
+
+    /* SEARCH */
+    .toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+    .search-wrap{flex:1;min-width:220px;position:relative}
+    .search-wrap input{width:100%;padding:10px 16px 10px 38px;border:1.5px solid #d1d5db;border-radius:9px;font-size:14px;outline:none;transition:border .2s}
+    .search-wrap input:focus{border-color:#8B0000;box-shadow:0 0 0 3px rgba(139,0,0,.08)}
+    .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#9ca3af;width:16px;height:16px}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+    .btn-primary{background:linear-gradient(135deg,#8B0000,#c0392b);color:#fff;box-shadow:0 3px 10px rgba(139,0,0,.25)}
+    .btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+    .btn-edit{background:#fff;color:#2563eb;border:1.5px solid #2563eb;padding:6px 12px;font-size:12px;border-radius:7px}
+    .btn-edit:hover{background:#eff6ff}
+    .btn-delete{background:#fff;color:#dc2626;border:1.5px solid #dc2626;padding:6px 12px;font-size:12px;border-radius:7px}
+    .btn-delete:hover{background:#fef2f2}
+
+    /* STATS */
+    .stats{display:flex;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+    .stat-card{background:#fff;border-radius:12px;padding:16px 22px;box-shadow:0 2px 8px rgba(0,0,0,.06);flex:1;min-width:140px}
+    .stat-card .val{font-size:26px;font-weight:700;color:#8B0000}
+    .stat-card .lbl{font-size:12px;color:#6b7280;margin-top:2px}
+
+    /* TABLE */
+    .table-wrap{background:#fff;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,.07);overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    thead th{background:#8B0000;color:#fff;padding:13px 14px;font-size:13px;font-weight:600;text-align:left;white-space:nowrap}
+    tbody tr{border-bottom:1px solid #f3f4f6;transition:background .15s}
+    tbody tr:hover{background:#fef9f9}
+    tbody td{padding:11px 14px;font-size:13.5px;color:#374151;vertical-align:middle}
+    .book-thumb{width:38px;height:50px;object-fit:cover;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+    .no-thumb{width:38px;height:50px;background:#f3f4f6;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:10px}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+    .badge-yes{background:#dcfce7;color:#16a34a}
+    .badge-no{background:#f3f4f6;color:#9ca3af}
+    .empty-row td{text-align:center;padding:40px;color:#9ca3af;font-size:14px}
+
+    /* MESSAGES */
+    .messages{margin-bottom:18px}
+    .msg{padding:12px 16px;border-radius:9px;margin-bottom:8px;font-size:13.5px;display:flex;align-items:center;gap:8px}
+    .msg-success{background:#f0fdf4;border:1px solid #86efac;color:#16a34a}
+    .msg-error{background:#fef2f2;border:1px solid #fca5a5;color:#dc2626}
+
+    /* MODAL OVERLAY */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;padding:20px}
+    .modal-overlay.open{display:flex}
+    .modal-box{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:slideUp .25s ease}
+    @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .modal-header{padding:20px 24px 14px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between}
+    .modal-header h2{font-size:17px;font-weight:700;color:#1a1a2e}
+    .modal-close{background:none;border:none;cursor:pointer;color:#9ca3af;font-size:20px;line-height:1;padding:4px}
+    .modal-close:hover{color:#374151}
+    .modal-body{padding:20px 24px}
+    .modal-footer{padding:14px 24px 20px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #f3f4f6}
+
+    /* FORM */
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .form-group{margin-bottom:15px}
+    .form-group label{display:block;font-size:12.5px;font-weight:600;color:#374151;margin-bottom:5px}
+    .form-group input,.form-group select{width:100%;padding:10px 13px;border:1.5px solid #d1d5db;border-radius:8px;font-size:13.5px;outline:none;font-family:'Roboto',sans-serif;transition:border .2s}
+    .form-group input:focus{border-color:#8B0000;box-shadow:0 0 0 3px rgba(139,0,0,.08)}
+    .form-group input[type=file]{padding:6px 10px;background:#fafafa;cursor:pointer}
+    .current-file{font-size:11.5px;color:#6b7280;margin-top:4px}
+    .current-file a{color:#8B0000}
+    .form-error{font-size:11.5px;color:#dc2626;margin-top:3px}
+
+    .btn-cancel{background:#f3f4f6;color:#374151;padding:9px 18px;border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;border:none}
+    .btn-cancel:hover{background:#e5e7eb}
+    .btn-save{background:linear-gradient(135deg,#8B0000,#c0392b);color:#fff;padding:9px 22px;border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;box-shadow:0 3px 10px rgba(139,0,0,.25)}
+    .btn-save:hover{opacity:.88}
+
+    /* DELETE CONFIRM */
+    .del-modal-box{background:#fff;border-radius:16px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:slideUp .25s ease;text-align:center;padding:32px 28px}
+    .del-icon{width:56px;height:56px;background:#fef2f2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+    .del-icon svg{width:26px;height:26px;color:#dc2626}
+    .del-title{font-size:17px;font-weight:700;color:#1a1a2e;margin-bottom:8px}
+    .del-msg{font-size:13.5px;color:#6b7280;line-height:1.5}
+    .del-actions{display:flex;gap:10px;justify-content:center;margin-top:22px}
+    .btn-del-confirm{background:#dc2626;color:#fff;padding:9px 22px;border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;border:none}
+    .btn-del-confirm:hover{background:#b91c1c}
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header-top">
+  <div><a href="#">VI</a> | <a href="#">EN</a></div>
+  <div><a href="https://ptit.edu.vn/">Cổng thông tin</a></div>
+</div>
+<div class="header-bottom">
+  <div class="logo">
+    <img src="{% static 'images/download-logo-vector-hoc-vien-cong-nghe-buu-chinh-vien-thong-mien-phi.jpg' %}">
+    <div>
+      <strong class="ten">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</strong><br>
+      <span>Posts and Telecommunications Institute of Technology</span>
+    </div>
+  </div>
+  <ul class="menu">
+    <li><a href="{% url 'home' %}">Trang chủ</a></li>
+    <li><a href="{% url 'manage_books' %}" style="color:#8B0000;font-weight:700">Quản lý sách</a></li>
+    <li><a href="{% url 'profile' %}">Trang cá nhân</a></li>
+    <li><a href="{% url 'logout' %}">Đăng xuất</a></li>
+  </ul>
+</div>
+
+<!-- Page -->
+<div class="page">
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="messages">
+    {% for msg in messages %}
+    <div class="msg {% if msg.tags == 'success' %}msg-success{% else %}msg-error{% endif %}">
+      {{ msg }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Title + Add button -->
+  <div class="page-title">
+    <h1>Quản lý <span>Sách</span></h1>
+    <button class="btn btn-primary" onclick="openAddModal()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Thêm sách mới
+    </button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card"><div class="val">{{ books.count }}</div><div class="lbl">Tổng số sách</div></div>
+    <div class="stat-card"><div class="val">{{ books|length }}</div><div class="lbl">Kết quả hiển thị</div></div>
+  </div>
+
+  <!-- Search + filter -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Tìm theo tên, tác giả, NXB..." value="{{ query }}" oninput="filterTable(this.value)">
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="bookTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Ảnh</th>
+          <th>Tên sách</th>
+          <th>Tác giả</th>
+          <th>NXB</th>
+          <th>SL</th>
+          <th>PDF</th>
+          <th style="text-align:center">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody id="bookTableBody">
+        {% for book in books %}
+        <tr data-title="{{ book.title|lower }}" data-author="{{ book.author|lower }}" data-publisher="{{ book.publisher|lower }}">
+          <td style="color:#9ca3af;font-size:12px">{{ forloop.counter }}</td>
+          <td>
+            {% if book.image %}
+              <img src="{{ book.image.url }}" class="book-thumb" alt="bìa">
+            {% else %}
+              <div class="no-thumb">N/A</div>
+            {% endif %}
+          </td>
+          <td><strong>{{ book.title }}</strong></td>
+          <td>{{ book.author }}</td>
+          <td>{{ book.publisher }}</td>
+          <td><strong>{{ book.quantity }}</strong></td>
+          <td>
+            {% if book.pdf_file %}
+              <span class="badge badge-yes">✓ Có</span>
+            {% else %}
+              <span class="badge badge-no">Chưa có</span>
+            {% endif %}
+          </td>
+          <td style="text-align:center;white-space:nowrap">
+            <button class="btn btn-edit" onclick="openEditModal({{ book.id }})">✏️ Sửa</button>
+            <button class="btn btn-delete" onclick="openDeleteModal({{ book.id }}, '{{ book.title|escapejs }}')">🗑️ Xóa</button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr class="empty-row"><td colspan="8">📚 Không tìm thấy sách nào.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ========== MODAL THÊM / SỬA SÁCH ========== -->
+<div class="modal-overlay" id="bookModal" onclick="closeOnOverlay(event,'bookModal')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="modalTitle">Thêm sách mới</h2>
+      <button class="modal-close" onclick="closeModal('bookModal')">✕</button>
+    </div>
+    <form id="bookForm" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="hidden" id="formAction" value="add">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Tên sách *</label>
+            <input type="text" name="title" id="f_title" placeholder="Nhập tên sách" required>
+            <div class="form-error" id="err_title"></div>
+          </div>
+          <div class="form-group">
+            <label>Tác giả *</label>
+            <input type="text" name="author" id="f_author" placeholder="Tên tác giả" required>
+            <div class="form-error" id="err_author"></div>
+          </div>
+          <div class="form-group">
+            <label>Nhà xuất bản *</label>
+            <input type="text" name="publisher" id="f_publisher" placeholder="NXB..." required>
+            <div class="form-error" id="err_publisher"></div>
+          </div>
+          <div class="form-group">
+            <label>Số lượng</label>
+            <input type="number" name="quantity" id="f_quantity" value="1" min="0">
+          </div>
+          <div class="form-group">
+            <label>Link đọc online (URL)</label>
+            <input type="url" name="uri" id="f_uri" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>Ảnh bìa</label>
+            <input type="file" name="image" id="f_image" accept="image/*">
+            <div class="current-file" id="cur_image"></div>
+          </div>
+          <div class="form-group">
+            <label>File PDF</label>
+            <input type="file" name="pdf_file" id="f_pdf" accept=".pdf">
+            <div class="current-file" id="cur_pdf"></div>
+          </div>
+        </div>
+        <div class="form-error" id="err_general" style="margin-top:6px"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeModal('bookModal')">Hủy</button>
+        <button type="submit" class="btn-save">💾 Lưu sách</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== MODAL XÁC NHẬN XÓA ========== -->
+<div class="modal-overlay" id="deleteModal" onclick="closeOnOverlay(event,'deleteModal')">
+  <div class="del-modal-box">
+    <div class="del-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+    </div>
+    <div class="del-title">Xác nhận xóa sách</div>
+    <div class="del-msg">Bạn có chắc muốn xóa sách<br><strong id="delBookName" style="color:#8B0000"></strong>?<br>Hành động này không thể hoàn tác.</div>
+    <form id="deleteForm" method="POST">
+      {% csrf_token %}
+      <div class="del-actions">
+        <button type="button" class="btn-cancel" onclick="closeModal('deleteModal')">Hủy</button>
+        <button type="submit" class="btn-del-confirm">Xóa</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const CSRF = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+// ── Tìm kiếm realtime ────────────────────────────────────────────
+function filterTable(q) {
+  q = q.toLowerCase().trim();
+  document.querySelectorAll('#bookTableBody tr:not(.empty-row)').forEach(row => {
+    const title = row.dataset.title || '';
+    const author = row.dataset.author || '';
+    const pub = row.dataset.publisher || '';
+    row.style.display = (title+author+pub).includes(q) ? '' : 'none';
+  });
+}
+
+// ── Mở / đóng modal ──────────────────────────────────────────────
+function openModal(id){ document.getElementById(id).classList.add('open') }
+function closeModal(id){ document.getElementById(id).classList.remove('open') }
+function closeOnOverlay(e, id){ if(e.target.id===id) closeModal(id) }
+
+// ── Modal Thêm ───────────────────────────────────────────────────
+function openAddModal(){
+  document.getElementById('modalTitle').textContent = 'Thêm sách mới';
+  document.getElementById('bookForm').action = "{% url 'add_book' %}";
+  document.getElementById('formAction').value = 'add';
+  // Reset form
+  ['f_title','f_author','f_publisher','f_uri'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f_quantity').value = 1;
+  document.getElementById('f_image').value = '';
+  document.getElementById('f_pdf').value = '';
+  document.getElementById('cur_image').innerHTML = '';
+  document.getElementById('cur_pdf').innerHTML = '';
+  clearErrors();
+  openModal('bookModal');
+}
+
+// ── Modal Sửa (load dữ liệu qua AJAX) ───────────────────────────
+function openEditModal(bookId){
+  fetch(`/manage/books/${bookId}/edit/`)
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('modalTitle').textContent = 'Sửa sách';
+      document.getElementById('bookForm').action = `/manage/books/${bookId}/edit/`;
+      document.getElementById('f_title').value = data.title;
+      document.getElementById('f_author').value = data.author;
+      document.getElementById('f_publisher').value = data.publisher;
+      document.getElementById('f_uri').value = data.uri;
+      document.getElementById('f_quantity').value = data.quantity;
+      document.getElementById('f_image').value = '';
+      document.getElementById('f_pdf').value = '';
+      document.getElementById('cur_image').innerHTML = data.image_url
+        ? `Ảnh hiện tại: <a href="${data.image_url}" target="_blank">xem</a> (bỏ trống = giữ nguyên)` : '';
+      document.getElementById('cur_pdf').innerHTML = data.pdf_url
+        ? `PDF hiện tại: <a href="${data.pdf_url}" target="_blank">xem</a> (bỏ trống = giữ nguyên)` : '';
+      clearErrors();
+      openModal('bookModal');
+    });
+}
+
+// ── Modal Xóa ────────────────────────────────────────────────────
+function openDeleteModal(bookId, bookName){
+  document.getElementById('delBookName').textContent = bookName;
+  document.getElementById('deleteForm').action = `/manage/books/${bookId}/delete/`;
+  openModal('deleteModal');
+}
+
+// ── Xóa lỗi ─────────────────────────────────────────────────────
+function clearErrors(){
+  document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+}
+
+// Phím ESC đóng modal
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    closeModal('bookModal');
+    closeModal('deleteModal');
+  }
+});
+</script>
+</body>
+</html>

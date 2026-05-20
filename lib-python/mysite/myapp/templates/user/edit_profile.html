@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Cập nhật thông tin</title>
+  <link rel="stylesheet" href="{% static 'css/edit_profile.css' %}">
+</head>
+<body>
+  <div class="header-top">
+      <div>
+        <a href="#">VI</a> | <a href="#"> EN</a>
+        <a href="https://www.facebook.com/HocvienPTIT/?locale=vi_VN"
+          ><i class="lni lni-facebook"></i
+        ></a>
+        <a href="https://www.youtube.com/@PChannels"
+          ><i class="lni lni-youtube"></i
+        ></a>
+      </div>
+      <div>
+        <a href="https://ptit.edu.vn/">Cổng thông tin</a>
+      </div>
+    </div>
+
+    <!-- Header Bottom -->
+    <div class="header-bottom">
+      <div class="logo">
+        <img  src="{% static 'images/download-logo-vector-hoc-vien-cong-nghe-buu-chinh-vien-thong-mien-phi.jpg' %}">
+        <div>
+          <strong class="ten">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</strong
+          ><br />
+          <span>Posts and Telecommunications Institute of Technology</span>
+        </div>
+      </div>
+      <ul class="menu">
+        <li><a href="{% url 'home' %}">Trang chủ </a></li>
+        <li>
+          <a href="#">Giới thiệu</a>
+        </li>
+        <li><a href="#">Tin tức & Sự kiện</a></li>
+        <li><a href="#">Liên hệ</a></li>
+        <li>
+          <a href="{% url 'logout' %}">Đăng Xuất</a>
+        </li>
+      </ul>
+    </div>
+  <div class="container">
+    <h2>Cập nhật thông tin</h2>
+    <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Lưu thay đổi</button>
+    </form>
+    <a class="back-link" href="{% url 'profile' %}">← Quay lại</a>
+  </div>
+</body>
+</html>

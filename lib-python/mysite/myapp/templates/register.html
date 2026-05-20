@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .auth-form {
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .errorlist {
+            color: red;
+            padding-left: 0;
+            list-style: none;
+            font-size: 0.9em;
+        }
+    </style>
+    <title>PTIT ELIB</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  </head>
+  <body>
+    <!-- Header Top -->
+
+    <!-- Header Bottom -->
+    <div class="header-bottom">
+      <div class="logo">
+        <img src="{% static 'images/download-logo-vector-hoc-vien-cong-nghe-buu-chinh-vien-thong-mien-phi.jpg' %}" alt="Logo">
+        <div>
+          <strong class="ten">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</strong
+          ><br />
+          <span>Posts and Telecommunications Institute of Technology</span>
+        </div>
+      </div>
+</head>
+<body>
+    <div class="auth-form">
+        <h2 class="text-center mb-4">Sign up</h2>
+        <form method="POST" action="">
+            {% csrf_token %}
+            
+            <!-- Họ và Tên -->
+            <div class="mb-3">
+                <input type="text" name="full_name" class="form-control" placeholder="Họ và Tên" required
+                    value="{{ form.full_name.value|default:'' }}">
+                {% if form.full_name.errors %}
+                <ul class="errorlist">
+                    {% for error in form.full_name.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <!-- Username -->
+            <div class="mb-3">
+                <input type="text" name="username" class="form-control" placeholder="Username" required
+                       value="{{ form.username.value|default:'' }}">
+                {% if form.username.errors %}
+                <ul class="errorlist">
+                    {% for error in form.username.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <!-- Email -->
+            <div class="mb-3">
+                <input type="email" name="email" class="form-control" placeholder="Email" required
+                       value="{{ form.email.value|default:'' }}">
+                {% if form.email.errors %}
+                <ul class="errorlist">
+                    {% for error in form.email.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <!-- Password 1 -->
+            <div class="mb-3">
+                <input type="password" name="password1" class="form-control" placeholder="Password" required>
+                {% if form.password1.errors %}
+                <ul class="errorlist">
+                    {% for error in form.password1.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                <small class="text-muted">Mật khẩu tối thiểu 8 ký tự, không được quá đơn giản.</small>
+                {% endif %}
+            </div>
+            
+            <!-- Password 2 -->
+            <div class="mb-3">
+                <input type="password" name="password2" class="form-control" placeholder="Confirm Password" required>
+                {% if form.password2.errors %}
+                <ul class="errorlist">
+                    {% for error in form.password2.errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <!-- Terms Checkbox -->
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" name="terms" id="termsCheck" required>
+                <label class="form-check-label" for="termsCheck">
+                    I agree to the <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-100 py-2">REGISTER</button>
+        </form>
+        
+        <!-- Phần chuyển hướng sang login -->
+        <div class="form-footer">
+            Already have an account? <a href="{% url 'login' %}">Login here</a>
+        </div>
+    </div>
+
+    <!-- Terms Modal (optional) -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Terms of Service</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Nội dung điều khoản ở đây -->
+                    <p>Điều khoản sử dụng sẽ được hiển thị tại đây...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

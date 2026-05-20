@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+*.pyc
+lib-python/mysite/db.sqlite3
+.DS_Store

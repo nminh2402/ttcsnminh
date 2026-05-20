@@ -1,0 +1,493 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.lineicons.com/4.0/lineicons.css" rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <title>PTIT ELIB</title>
+    <script src="{% static 'js/style.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  </head>
+  <body>
+    <header class = "fixed-header">
+      <!-- Header Top -->
+    <div class="header-top">
+      <div>
+        <a href="#">VI</a> | <a href="#"> EN</a>
+        <a href="https://www.facebook.com/HocvienPTIT/?locale=vi_VN"
+          ><i class="lni lni-facebook"></i
+        ></a>
+        <a href="https://www.youtube.com/@PChannels"
+          ><i class="lni lni-youtube"></i
+        ></a>
+      </div>
+      <div>
+        <a href="https://ptit.edu.vn/">Cổng thông tin</a>
+      </div>
+    </div>
+    <!-- Header Bottom -->
+    <div class="header-bottom">
+      <div class="logo">
+        <img src="{% static 'images/download-logo-vector-hoc-vien-cong-nghe-buu-chinh-vien-thong-mien-phi.jpg' %}" alt="Logo">
+        <div>
+          <strong class="ten">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</strong
+          ><br />
+          <span>Posts and Telecommunications Institute of Technology</span>
+        </div>
+      </div>
+      <ul class="menu">
+        <li><a href="#" >Trang chủ</a></li>
+        <li>
+          <a href="{% url 'intro' %}">Giới thiệu</a>
+        </li>
+        <li><a href="https://ptit.edu.vn/tin-tuc-su-kien/tin-tuc/tin-tuc-chung">Tin tức & Sự kiện</a></li>
+        {% if request.user.is_staff %}
+        <li>
+          <a href="{% url 'manage_books' %}" style="color:#8B0000;font-weight:700;background:rgba(139,0,0,.08);padding:4px 10px;border-radius:6px;">
+            ⚙️ Quản lý sách
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+      <ul class="auth-menu">
+        {% if request.user.is_authenticated %}
+          <li class="user-menu">
+            <div class="dropdown">
+              <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user"></i>
+                <span>{{ request.user }}</span>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> Thông tin cá nhân</a></li>
+                <li><a class="dropdown-item" href="{% url 'borrowed_books' %}"><i class="fas fa-book"></i> Sách đã mượn</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+              </ul>
+            </div>
+          </li>
+        {% else %}
+          <li class="auth-links">
+            <a href="{% url 'login' %}" class="login-btn">Đăng Nhập</a>
+            <a href="{% url 'register' %}" class="register-btn">Đăng Ký</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </ul>
+  <!-- Search Bar -->
+    <section class="search-section">
+      {% if request.user.is_authenticated %}
+        <form action="{% url 'search' %}" method="GET" style="display: flex; align-items: center; width: 100%;">
+          
+          <select class="pick" name="category" style="margin-right: 10px;">
+            <option value="all" {% if category == 'all' %}selected{% endif %}>Tất cả</option>
+            <option value="book" {% if category == 'book' %}selected{% endif %}>Sách</option>
+            <option value="giaotrinh" {% if category == 'giaotrinh' %}selected{% endif %}>Giáo Trình</option>
+          </select>
+
+          <input class="timkiem" type="text" name="q" value="{{ query }}" placeholder="Nhập từ khóa tìm kiếm" required>
+          <button class="search-button" type="submit">Tìm kiếm</button>
+
+          <!-- Biểu tượng camera -->
+          <!-- Nút máy ảnh -->
+          <!-- Nút camera mở modal -->
+          <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#imageModal">
+            <i class="fa fa-camera"></i>
+          </button>
+        
+        </form>
+      {% else %}
+        <input class="timkiem" type="text" name="q" placeholder="Vui lòng đăng nhập để tìm kiếm" required>
+        <button class="search-button" onclick="window.location.href='{% url 'login' %}'">Tìm kiếm</button>
+      {% endif %}
+    </section>
+
+
+  </header>
+  <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+  <main>
+  <div class="carousel-indicators">
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="https://ptit.edu.vn/wp-content/uploads/2025/03/1958x745-1.png" class="d-block w-100" alt="..." style= "height : 380px";>
+    </div>
+    <div class="carousel-item">
+      <img src= "https://images.pexels.com/photos/694740/pexels-photo-694740.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" class="d-block w-100" alt="..." style= "height : 380px";>
+    </div>
+    <div class="carousel-item">
+      <img src="https://images.pexels.com/photos/2041540/pexels-photo-2041540.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" class="d-block w-100" alt="..." style= "height : 380px";>
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+
+<div class="container">
+    <div class="top-section">
+      <div class="video">
+        <iframe width="560" height="315" 
+          src="https://www.youtube.com/embed/yk_H5syk3_0" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+        </iframe>
+      </div>
+      <div class="description">
+        <h1>PTIT-LIB là gì?</h1>
+        <p>
+          PTIT-Lib là trung tâm thông tin thư viện của Học viện Công nghệ Bưu chính Viễn thông, 
+          được thành lập để hỗ trợ học tập, nghiên cứu và giảng dạy. Với hệ thống tài nguyên phong phú và cơ sở vật chất hiện đại, 
+          PTIT-Lib đáp ứng nhu cầu của sinh viên, giảng viên và cán bộ trên toàn quốc...
+        </p>
+      </div>
+    </div>
+  </div>  
+    <div class="user-types">
+      <h2>PTIT-LIB dành cho...</h2>
+      <div class="icons">
+        <div class="icon">
+          <img src="https://media.istockphoto.com/id/1268716253/vi/vec-to/bi%E1%BB%83u-t%C6%B0%E1%BB%A3ng-h%C3%ACnh-ch%E1%BB%AF-m%C3%A0u-%C4%91en-c%E1%BB%A7a-sinh-vi%C3%AAn-n%C4%83m-nh%E1%BA%A5t.jpg?s=612x612&w=0&k=20&c=NRMdsSwRi12P86rsaILqcQ2pL0-4InWUcZhzTIDjQ78=" alt="Icon" width="24">
+          <p><strong>Dành cho giáo viên, học sinh</strong></p>
+        </div>
+        <div class="icon">
+          <img src="https://tienloc.net.vn/wp-content/uploads/2021/01/ban-kam-viec.jpg" alt="Ban giám hiệu">
+          <p><strong>Dành cho ban giám hiệu</strong></p>
+        </div>
+        <div class="icon">
+          <img src="https://png.pngtree.com/png-clipart/20230915/original/pngtree-jurors-icon-symbol-simple-design-score-office-symbol-vector-png-image_12182592.png" alt="Thủ thư">
+          <p><strong>Tính năng dành cho cán bộ thư viện</strong></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Nút Back to Top -->
+
+  <!-- Back to Top Button -->
+  <button id="back-to-top" class="back-to-top" aria-label="Về đầu trang">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+
+  <section class="features-section">
+        <div class="section-header">
+            <h1>TÍNH NĂNG NỔI BẬT</h1>
+        </div>
+        <div class="features-container">
+            <div class="feature-card">
+                <span class="feature-number">01</span>
+                <div class="feature-icon">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+                <h2>LỢI ÍCH VỀ MẶT NGHIỆP VỤ</h2>
+                <p>Hệ thống quản lý thư viện trường học được xây dựng dựa trên các chuẩn chung của hệ thống thư viện thế giới và sử dụng giao diện Web nền đảm bảo khả năng tương tác, tương thích với các hệ thống khác một cách dễ dàng.</p>
+                <a href="#" class="read-more">Xem thêm <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-number">02</span>
+                <div class="feature-icon">
+                    <i class="fas fa-school"></i>
+                </div>
+                <h2>LỢI ÍCH VỀ PHÍA NHÀ TRƯỜNG</h2>
+                <p>Về phía nhà trường, ban lãnh đạo có thể tự điều chỉnh việc bổ sung và quản lý hiệu quả nguồn tài liệu, đánh giá chính xác nhu cầu và khả năng thông tin của học sinh, phân tích số liệu và đưa ra báo cáo cần thiết về hoạt động của thư viện.</p>
+                <a href="#" class="read-more">Xem thêm <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-number">03</span>
+                <div class="feature-icon">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+                <h2>LỢI ÍCH VỀ PHÍA THƯ VIỆN, CÁN BỘ THƯ VIỆN</h2>
+                <p>Cán bộ thư viện có thể quản lý tất cả: ấn phẩm, tài sản thư viện và tự động hóa các khâu xử lý nghiệp vụ từ đơn giản đến phức tạp. Bạn đọc cũng dễ dàng tiếp cận, khai thác tối đa nguồn tài nguyên của thư viện phục vụ mục đích học tập và nghiên cứu.</p>
+                <a href="#" class="read-more">Xem thêm <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+  <!-- Recommended Books Section -->
+{% if recommended_books %}
+<section class="recommended-books-section">
+  <div class="container">
+    <div class="section-title">
+      <h2>SÁCH CÓ THỂ MƯỢN</h2>
+    </div>
+
+    <div class="book-slider-container">
+      <button class="slider-nav-btn prev-btn">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+
+      <div class="book-slider">
+        {% for book in recommended_books %}
+        <div class="book-item">
+          <div class="book-cover">
+            {% if book.image %}
+              <img src="{{ book.image.url }}" alt="{{ book.title }}">
+            {% else %}
+              <img src="{% static 'images/default-book-cover.jpg' %}" alt="{{ book.title }}">
+            {% endif %}
+
+            <div class="book-overlay">
+              {% if book.quantity > 0 %}
+                <button class="btn-view" onclick="openBorrowModal({{ book.id }}, this)">
+                  <i class="bi bi-book"></i> Mượn sách
+                </button>
+              {% else %}
+                <button class="btn-view disabled" disabled>
+                  <i class="bi bi-book"></i> Hết sách
+                </button>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="book-info">
+            <h3>{{ book.title }}</h3>
+            <p class="author">{{ book.author }}</p>
+            <div class="rating">
+              {% for i in "12345" %}
+                {% if i|add:"0" <= book.rating|add:"0" %}
+                  <i class="bi bi-star-fill"></i>
+                {% elif i|add:"0" <= book.rating|add:"0.5" %}
+                  <i class="bi bi-star-half"></i>
+                {% else %}
+                  <i class="bi bi-star"></i>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <a href="{% url 'book_detail' book.id %}" class="btn-detail-below">
+              <i class="bi bi-eye"></i> Xem chi tiết
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <button class="slider-nav-btn next-btn">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    <div class="slider-dots">
+      <!-- Dots sẽ được tạo bởi JavaScript -->
+    </div>
+  </div>
+</section>
+{% endif %}
+
+  <!-- Sách yêu thích section -->
+  <section class="favorite-books-section">
+    <div class="container">
+      <div class="section-title">
+        <h2>SÁCH YÊU THÍCH</h2>
+      </div>
+
+      <div class="row book-row">
+        {% for book in books|slice:":8" %}
+        <div class="col-md-3 col-sm-6 mb-4">
+          <div class="book-item">
+            <div class="book-cover">
+              {% if book.image %}
+                <img src="{{ book.image.url }}" alt="{{ book.title }}">
+              {% else %}
+                <img src="{% static 'images/default-book-cover.jpg' %}" alt="{{ book.title }}">
+              {% endif %}
+              <div class="book-overlay">
+                {% if book.quantity > 0 %}
+                  <button class="btn-view" onclick="openBorrowModal({{ book.id }}, this)">
+                    <i class="bi bi-book"></i> Mượn sách
+                  </button>
+                {% else %}
+                  <button class="btn-view disabled" disabled>
+                    <i class="bi bi-book"></i> Hết sách
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+            <div class="book-info">
+              <h3>{{ book.title }}</h3>
+              <p class="author">{{ book.author }}</p>
+              <div class="rating">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star"></i>
+              </div>
+              <a href="{% url 'book_detail' book.id %}" class="btn-detail-below">
+                <i class="bi bi-eye"></i> Xem chi tiết
+              </a>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-4">
+          <p style="color:#888;">Chưa có sách nào trong hệ thống.</p>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- View More Button -->
+      <div class="text-center mt-4">
+        <a href="{% url 'book' %}" class="btn-more">Xem thêm sách</a>
+      </div>
+    </div>
+  </section>
+
+
+
+  <section class="news-section">
+    <div class="news-header">
+      <h2>Tin tức - Sự kiện</h2>
+    </div>
+    <div class="news-cards">
+      <div class="news-card">
+        <img src="https://adminweb.thuvien.edu.vn/UploadFolderNew/UBNDLongBien/Image/qi/administrator/IMG_20210915_175140-1631705844927.jpg" alt="news1" />
+        <div class="news-content">
+          <h3>Tiêu đề Tin tức 1</h3>
+          <p>Hà Nội công bố kho học liệu điện tử dùng cho dạy học trực tuyến</p>
+          <a href="https://tuoitre.vn/ha-noi-cong-bo-kho-hoc-lieu-dien-tu-dung-cho-day-hoc-truc-tuyen-20210915175525793.htm" class="read-more">Xem thêm</a>
+        </div>
+      </div>
+      <div class="news-card">
+        <img src="https://adminweb.thuvien.edu.vn/UploadFolderNew/UBNDLongBien/Image/qi/administrator/HN(1).jpg" alt="news2" />
+        <div class="news-content">
+          <h3>Tiêu đề Tin tức 2</h3>
+          <p>Phát động Cuộc thi Đại sứ Văn hóa đọc Thành phố Hà Nội lần thứ II và Cuộc thi Giới thiệu sách trực tuyến năm 2022</p>
+          <a href="https://vuthuvien.bvhttdl.gov.vn/phat-dong-cuoc-thi-dai-su-van-hoa-doc-thanh-pho-ha-noi-lan-thu-ii-va-cuoc-thi-gioi-thieu-sach-truc-tuyen-nam-2022/" class="read-more">Xem thêm</a>
+        </div>
+      </div>
+      <div class="news-card">
+        <img src="https://adminweb.thuvien.edu.vn/UploadFolderNew/UBNDLongBien/Image/qi/administrator/tong-hop-cac-thu-vien-o-ha-noi-dan-mot-sach-kho-long-bo-qua636493807224876953.jpg" alt="news2" />
+        <div class="news-content">
+          <h3>Tiêu đề Tin tức 3</h3>
+          <p>9 thư viện lớn cho ở HN mọi đối tượng độc giả, bao gồm cả trẻ em</p>
+          <a href="https://cafef.vn/9-thu-vien-mien-phi-sang-xin-min-nhat-ha-noi-co-so-vat-chat-hien-dai-hang-ngan-dau-sach-chat-luong-18823072022221053.chn" class="read-more">Xem thêm</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+  </body>
+
+  <!-- Borrow Modal -->
+  <div class="modal fade" id="borrowModal" tabindex="-1" aria-labelledby="borrowModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="borrowModalLabel">Thông tin mượn sách</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="borrowForm">
+            <input type="hidden" id="borrowBookId">
+            <div class="mb-3">
+              <label for="expectedReturnDate" class="form-label">Ngày dự kiến trả (*)</label>
+              <input type="date" class="form-control" id="expectedReturnDate" required>
+            </div>
+            <div class="mb-3">
+              <label for="borrowNote" class="form-label">Ghi chú thêm</label>
+              <textarea class="form-control" id="borrowNote" rows="3" placeholder="Mục đích mượn, tình trạng sách..."></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary" id="confirmBorrowBtn">Xác nhận mượn</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <!-- Footer -->
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <p class="thuvien">
+            <strong
+              >TRUNG TÂM THÔNG TIN THƯ VIỆN – HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN
+              THÔNG</strong
+            >
+          </p>
+        </div>
+        <div class="col-4">
+          <div class="footer-column">
+            <p>
+              <strong>Trụ sở chính:</strong><br />122 Hoàng Quốc Việt, Q.Cầu
+              Giấy, Hà Nội
+            </p>
+            <p>
+              <strong>Cơ sở đào tạo tại Hà Nội:</strong><br />Km10, Đường Nguyễn
+              Trãi, Q.Hà Đông, Hà Nội
+            </p>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="footer-column">
+            <p>
+              <strong>Học viện cơ sở tại TP Hồ Chí Minh:</strong><br />11 Nguyễn
+              Đình Chiểu, P.Đa Kao, Q.1 TP Hồ Chí Minh
+            </p>
+            <p>
+              <strong>Cơ sở đào tạo tại TP Hồ Chí Minh:</strong><br />Đường Man
+              Thiện, P.Hiệp Phú, Q.9 TP Hồ Chí Minh
+            </p>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="map-container">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1862.6453264514646!2d105.78610757722628!3d20.980983103220105!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135accdd8a1ad71%3A0xa2f9b16036648187!2zSOG7jWMgdmnhu4duIEPDtG5nIG5naOG7hyBCxrB1IGNow61uaCB2aeG7hW4gdGjDtG5n!5e0!3m2!1svi!2s!4v1730383925525!5m2!1svi!2s"
+              style="border: 0"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</html>
+<!-- Modal tìm kiếm bằng ảnh -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-4 text-center">
+      <h5 class="modal-title mb-3">Tìm kiếm sách bằng ảnh bìa</h5>
+      <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{% url 'upload_cover' %}">
+        {% csrf_token %}
+        <input type="file" name="image" id="imageInput" accept="image/*" class="form-control mb-3" required>
+        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+      </form>
+      <div id="resultArea" class="mt-3"></div>
+    </div>
+  </div>
+</div>
+
+

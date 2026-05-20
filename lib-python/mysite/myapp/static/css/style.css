@@ -1,0 +1,1642 @@
+body,
+ul,
+li {
+  margin: 0;
+  padding: 5px;
+}
+
+/* Header styles */
+.header-top {
+  background-color: #b31e1e;
+  color: white;
+  font-size: 17px;
+  display: flex ;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 5px;
+}
+
+.header-top a {
+  color: white;
+  margin-right: 20px;
+  text-decoration: none;
+}
+
+.header-bottom {
+  background-color: white;
+  padding: 3px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 60px;
+  margin-right: 5px;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.menu li {
+  position: relative;
+}
+
+.menu li a {
+  color: #333;
+  text-decoration: none;
+  padding: 10px 15px;
+  display: block;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+}
+
+.menu li a:hover {
+  color: #d32f2f;
+}
+
+.menu li a:not(.dropdown-toggle)::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  background: #d32f2f;
+  bottom: 0;
+  left: 0;
+  transition: width 0.3s ease;
+}
+
+.menu li a:not(.dropdown-toggle):hover::after {
+  width: 100%;
+}
+
+.submenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  list-style: none;
+}
+
+.submenu li {
+  padding: 10px 20px;
+}
+
+.menu li:hover .submenu {
+  display: block;
+}
+.ten {
+  color: #b31e1e;
+  font-size: 15px;
+}
+
+
+.timkiem {
+  padding: 6px;
+  display: block;
+  width: 70%;
+  position: relative;
+  height: 32px;
+}
+.pick {
+  display: block;
+  padding: 6px;
+}
+
+main {
+  display: flex;
+  padding: 15px;
+  justify-content: space-between;
+}
+
+.filter-section,
+.author-section {
+  width: 30%;
+  background-color: white;
+  padding: 20px;
+}
+
+.filter-header {
+  background-color: #cc0000;
+  color: white;
+  padding: 10px;
+  margin-bottom: 2px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.filter-section ul,
+.author-section ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+div.desc {
+  padding: 15px;
+  text-align: center;
+}
+.footer {
+  background-color: #f1f1f1;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-family: Arial, sans-serif;
+}
+
+.h3 {
+  font-size: 18px;
+  color: #0d403a;
+  font-weight: bold;
+}
+
+.p {
+  font-size: 14px;
+  color: #333;
+  margin: 5px 0;
+}
+
+.footer-content {
+  display: flex;
+  gap: 40px;
+  flex: 1;
+}
+
+.footer-column {
+  max-width: 200px;
+}
+
+.footer-map {
+  width: 300px;
+  height: 200px;
+  border: none;
+}
+.thuvien {
+  font-size: 22px;
+}
+
+  .search-section {
+    display: flex;
+    align-items: center;
+    background-color: #f2f2f2;
+    padding: 5px;
+  }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropbtn {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 150px;
+    border: 1px solid #ccc;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+  }
+
+  .dropdown-content button {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .dropdown-content button:hover {
+    background-color: #ddd;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+
+  .timkiem {
+    flex-grow: 1;
+    padding: 5px;
+    margin: 0 5px;
+  }
+
+  .search-button {
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+  }
+
+
+/* User info style */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info span {
+  color: white;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  background: #dc3545;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.login-btn {
+  background: #fd0d0d;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.logout-btn:hover, .login-btn:hover {
+  opacity: 0.9;
+  color: white;
+}
+
+/* Điều chỉnh header-top cho mobile */
+@media (max-width: 768px) {
+  .header-top {
+      flex-direction: column;
+      text-align: center;
+      padding: 10px;
+  }
+
+  .header-top a {
+      margin: 5px 0;
+  }
+
+  .header-bottom {
+      flex-direction: column;
+      padding: 10px;
+  }
+
+  .logo img {
+      height: 50px; /* Giảm kích thước logo */
+  }
+}
+
+
+.auth-links {
+  display: flex;
+  align-items: center;
+  gap: 0px;
+  margin-left: 30px;
+  padding-top: 15px;
+}
+
+.welcome-text {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.login-btn, .register-btn, .logout-btn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: red;
+  font-size: 14px;
+}
+
+.login-btn {
+  background: red;
+}
+
+.login-btn:hover {
+  background-color:  #8b1515;
+  transform: translateY(-2px);
+}
+
+.register-btn {
+  background-color: transparent;
+  color: var(--primary-color);
+}
+
+.register-btn:hover {
+  background-color:  #8b1515;
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background-color: #b31e1e;
+}
+
+.logout-btn:hover {
+  background-color:  #8b1515;
+  transform: translateY(-2px);
+}
+
+/* Điều chỉnh menu cho mobile */
+@media (max-width: 768px) {
+  .menu {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+  }
+
+  .submenu {
+      position: static;
+      box-shadow: none;
+      background-color: transparent;
+  }
+
+  .menu li {
+      text-align: center;
+  }
+}
+
+/* Điều chỉnh main layout */
+@media (max-width: 768px) {
+  main {
+      flex-direction: column;
+  }
+}
+
+/* Điều chỉnh phần bài viết */
+@media (max-width: 768px) {
+  .posts {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .post-item {
+      width: 90%;
+  }
+
+  .post-item img {
+      height: auto; /* Ảnh co giãn theo chiều rộng */
+  }
+}
+
+/* Điều chỉnh footer */
+@media (max-width: 768px) {
+  .footer {
+      flex-direction: column;
+      text-align: center;
+  }
+
+  .footer-content {
+      flex-direction: column;
+      gap: 20px;
+  }
+}
+
+.mobile-menu-button {
+  display: none; /* Ẩn trên laptop */
+  background-color: #b31e1e;
+  color: white;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-button {
+      display: block;
+  }
+
+  .menu {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      background-color: white;
+      position: absolute;
+      top: 50px;
+      left: 0;
+      z-index: 1000;
+  }
+
+  .menu.active {
+      display: flex;
+  }
+}
+
+.map-container {
+  position: relative;
+  padding-bottom: 56.25%; /* Tỷ lệ 16:9 cho desktop */
+  height: 0;
+  overflow: hidden;
+  max-width: 100%; /* Đảm bảo không tràn */
+}
+
+.map-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Tối ưu cho mobile */
+@media (max-width: 768px) {
+  .map-container {
+    padding-bottom: 75%; /* Tỷ lệ 4:3 cho mobile */
+  }
+}
+
+@media (max-width: 768px) {
+  .fixed-header {
+    max-width: 1200px;
+  }
+}
+/* Reset CSS */
+/* Reset CSS */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding-top: 150px;
+  background: #f8f8f8;
+  box-sizing: border-box;
+
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+}
+
+.top-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.video video {
+  width: 100vw;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  max-width: 100%;
+}
+
+.description {
+  flex: 1;
+}
+
+.description h1 {
+  color: red;
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.description p {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.user-types {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.user-types h2 {
+  color: red;
+  font-size: 28px;
+}
+
+.icons {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.icon {
+  text-align: center;
+}
+
+.icon img {
+  width: 100px;
+  height: 100px;
+}
+
+.icon p {
+  font-size: 16px;
+  margin-top: 10px;
+  color: red;
+}
+
+.fixed-header {
+  position: fixed; /* Cố định header */
+  top: 0;          /* Dính sát đỉnh trình duyệt */
+  left: 0;         /* Căn lề trái */
+  width: 100%;     /* Chiều rộng full màn hình */
+  background-color: #fff; /* Màu nền (tuỳ chỉnh) */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  z-index: 1000;   /* Đảm bảo header luôn trên cùng */
+}
+
+/* Để tránh nội dung bị che bởi header, thêm padding vào phần main */
+main {
+  padding-top: 20px; /* = chiều cao của header */
+}
+
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #2c3e50;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f5f7fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+.features-section {
+  padding: 80px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.section-header h1 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 15px;
+}
+
+.section-header h1::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 3px;
+  background-color: var(--accent-color);
+}
+
+.features-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+  transition: height 0.3s ease;
+}
+
+.feature-card:hover::before {
+  height: 10px;
+}
+
+.feature-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: -1;
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  color: var(--secondary-color);
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+.feature-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: var(--primary-color);
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.feature-card h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background-color: var(--accent-color);
+}
+
+.feature-card p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.read-more {
+  display: inline-block;
+  color: var(--secondary-color);
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.read-more:hover {
+  color: var(--accent-color);
+}
+
+.read-more i {
+  margin-left: 5px;
+  transition: transform 0.3s ease;
+}
+
+.read-more:hover i {
+  transform: translateX(5px);
+}
+
+/* Animation */
+@keyframes fadeInUp {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+.feature-card {
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+.feature-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.feature-card:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.feature-card:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .features-container {
+      grid-template-columns: 1fr;
+  }
+  
+  .section-header h1 {
+      font-size: 2rem;
+  }
+}
+
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #2c3e50;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+}
+
+/* Tin tức - sự kiện */
+.news-section {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 40px 20px;
+  background-color: #fff;
+}
+
+.news-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.news-header h2 {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 10px;
+}
+
+.news-header h2::after {
+  content: '';
+  position: absolute;
+  width: 80px;
+  height: 3px;
+  background-color: var(--accent-color);
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.news-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.news-card {
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+}
+
+.news-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.news-content {
+  padding: 20px;
+}
+
+.news-content h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.news-content p {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.news-content .read-more {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid #1abc9c;
+  color: #1abc9c;
+  text-decoration: none;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+}
+
+.news-content .read-more:hover {
+  background-color: #1abc9c;
+  color: #fff;
+}
+
+.recommended-books-section {
+  padding: 60px 0;
+  background-color: #fff8f8;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #c00;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 15px;
+}
+
+.section-title h2:after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 80px;
+  height: 3px;
+  background: #c00;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.book-slider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.book-slider {
+  display: flex;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  gap: 20px;
+  padding: 20px 0;
+  width: 100%;
+}
+
+.book-item {
+  min-width: calc(25% - 15px); /* 4 items per row */
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid #eee;
+  border-bottom: 3px solid #c00;
+}
+
+@media (max-width: 992px) {
+  .book-item {
+    min-width: calc(33.333% - 14px); /* 3 items per row */
+  }
+}
+
+@media (max-width: 768px) {
+  .book-item {
+    min-width: calc(50% - 10px); /* 2 items per row */
+  }
+}
+
+@media (max-width: 576px) {
+  .book-item {
+    min-width: calc(100% - 0px); /* 1 item per row */
+  }
+}
+
+.book-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.book-cover {
+  height: 220px;
+  overflow: hidden;
+  position: relative;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.book-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(180, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.book-item:hover .book-overlay {
+  opacity: 1;
+}
+
+.book-item:hover .book-cover img {
+  transform: scale(1.05);
+}
+
+/* Nút Xem chi tiết */
+.btn-detail {
+  display: inline-block;
+  width: 85%;
+  padding: 7px 12px;
+  background: white;
+  color: #c00;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.3s;
+  border: 2px solid white;
+}
+
+.btn-detail:hover {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+/* Nút Mượn sách */
+.btn-borrow {
+  display: inline-block;
+  width: 85%;
+  padding: 7px 12px;
+  background: transparent;
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid white;
+}
+
+.btn-borrow:hover:not(:disabled) {
+  background: white;
+  color: #c00;
+}
+
+.btn-borrow.disabled,
+.btn-borrow:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Nút Xem chi tiết — hiện bên dưới tên sách */
+.btn-detail-below {
+  display: block;
+  margin-top: 8px;
+  padding: 6px 0;
+  color: #c00;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  border: 1.5px solid #c00;
+  border-radius: 6px;
+  transition: all 0.25s;
+}
+
+.btn-detail-below:hover {
+  background: #c00;
+  color: white;
+}
+
+/* Giữ lại .btn-view cho các section khác */
+.btn-view {
+  padding: 8px 16px;
+  background: white;
+  color: #c00;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  border: 1px solid white;
+}
+
+.btn-view:hover {
+  background: #c00;
+  color: white;
+  border: 1px solid white;
+}
+
+.book-info {
+  padding: 15px;
+  text-align: center;
+}
+
+.book-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.book-info .author {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.rating {
+  color: #c00;
+  margin-bottom: 10px;
+}
+
+.slider-nav-btn {
+  background: rgba(255,255,255,0.8);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #c00;
+  font-size: 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: absolute;
+  z-index: 2;
+  transition: all 0.3s;
+}
+
+.prev-btn {
+  left: -20px;
+}
+
+.next-btn {
+  right: -20px;
+}
+
+.slider-nav-btn:hover {
+  background: white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  color: #a00;
+}
+
+.slider-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ddd;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dot.active {
+  background: #c00;
+}
+
+@media (max-width: 767px) {
+  .book-cover {
+    height: 180px;
+  }
+  
+  .slider-nav-btn {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+.favorite-books-section {
+  padding: 60px 0;
+  background-color: #fff8f8;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title h2 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #c00;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 15px;
+}
+
+.section-title h2:after {
+  content: '';
+  position: absolute;
+  display: block;
+  width: 80px;
+  height: 3px;
+  background: #c00;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.book-item {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  height: 100%;
+  border: 1px solid #eee;
+  border-bottom: 3px solid #c00;
+}
+
+.book-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.book-cover {
+  height: 220px;
+  overflow: hidden;
+  position: relative;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.book-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(180, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.book-item:hover .book-overlay {
+  opacity: 1;
+}
+
+.book-item:hover .book-cover img {
+  transform: scale(1.05);
+}
+
+.btn-view {
+  padding: 8px 16px;
+  background: white;
+  color: #c00;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  border: 1px solid white;
+}
+
+.btn-view:hover {
+  background: #c00;
+  color: white;
+  border: 1px solid white;
+}
+
+.book-info {
+  padding: 15px;
+  text-align: center;
+}
+
+.book-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.book-info .author {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.rating {
+  color: #c00;
+  margin-bottom: 10px;
+}
+
+.btn-more {
+  display: inline-block;
+  padding: 10px 30px;
+  background: #c00;
+  color: white;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s;
+  border: 2px solid #c00;
+}
+
+.btn-more:hover {
+  background: white;
+  color: #c00;
+}
+
+.book-row {
+  margin-bottom: 20px;
+}
+
+@media (max-width: 767px) {
+  .book-cover {
+    height: 180px;
+  }
+}
+
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #c00;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(180, 0, 0, 0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  background-color: #a00;
+  box-shadow: 0 6px 16px rgba(180, 0, 0, 0.4);
+  transform: translateY(-3px);
+}
+
+.back-to-top:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 8px rgba(180, 0, 0, 0.3);
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(204, 0, 0, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(204, 0, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(204, 0, 0, 0);
+  }
+}
+
+.back-to-top.visible {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .back-to-top {
+    width: 45px;
+    height: 45px;
+    bottom: 20px;
+    right: 20px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .back-to-top {
+    width: 40px;
+    height: 40px;
+    bottom: 15px;
+    right: 15px;
+    font-size: 18px;
+  }
+}
+#back-to-top {
+  transition: opacity 0.3s, visibility 0.3s;
+  opacity: 0;
+  visibility: hidden;
+}
+#back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+.recommended-books {
+  padding: 60px 0;
+  background-color: var(--background-color);
+}
+
+.section-title {
+  color: var(--primary-color);
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title:after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: var(--gradient);
+  border-radius: 2px;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
+  padding: 0 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.book-item {
+  background: var(--white);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.book-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.book-cover {
+  height: 350px;
+  overflow: hidden;
+  position: relative;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.book-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(179, 30, 30, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.book-item:hover .book-overlay {
+  opacity: 1;
+}
+
+.book-item:hover .book-cover img {
+  transform: scale(1.05);
+}
+
+.btn-view {
+  padding: 12px 24px;
+  background: transparent;
+  color: whitesmoke;
+  border-radius: 4px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--transition);
+  border: 1px solid var(--white);
+}
+
+.btn-view:hover {
+  background: gray;
+  color: var(--white);
+}
+
+.book-info {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.book-info h3 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: var(--text-color);
+  min-height: 50px;
+}
+
+.book-info .author {
+  color: var(--light-text);
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.book-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding: 0 20px 20px;
+}
+
+.book-actions form {
+  width: 100%;
+}
+
+.btn-borrow {
+  width: 100%;
+  padding: 15px 25px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 600;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--primary-color);
+  color: var(--white);
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.btn-borrow:hover:not(.disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(179, 30, 30, 0.3);
+  background: var(--secondary-color);
+}
+
+.btn-borrow.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--light-text);
+  color: var(--white);
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-borrow i {
+  font-size: 20px;
+}
+/* Thêm phần CSS này vào */
+.auth-menu, .user-menu {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  color: #000000;
+  background: #f8f9fa;
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  font-weight: 600;
+  font-size: 16px;
+  border: none;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.dropdown-toggle:hover, .dropdown-toggle:focus {
+  background: #f1eaea;
+  color: #a00;
+  box-shadow: 0 4px 16px rgba(179,30,30,0.10);
+}
+
+/* Remove underline effect for user */
+.auth-menu .dropdown-toggle::after,
+.user-menu .dropdown-toggle::after {
+  display: none !important;
+  content: none !important;
+  width: 0 !important;
+}
+
+/* Style cho phần user và đăng xuất */
+.auth-links {
+  margin-left: auto;
+}
+
+.logout-btn, .login-btn, .register-btn {
+  padding: 5px 10px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.logout-btn {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.logout-btn:hover {
+  background-color: #b71c1c;
+}
+
+.login-btn {
+  background-color:  #d32f2f;
+  margin-right: 10px;
+}
+
+.register-btn {
+  background-color: #d32f2f;
+  color: white;
+  padding-left: 17px;
+  padding-right: 17px;
+}
+
+.register-btn:hover {
+  background-color: #b71c1c;
+}
+
+/* Icon user */
+.fas.fa-user {
+  color: #070505;
+}
+a {
+  text-decoration: none !important;
+}
