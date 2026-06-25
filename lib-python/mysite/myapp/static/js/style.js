@@ -154,10 +154,22 @@ function getCookie(name) {
 
 let currentBorrowButton = null;
 
-function openBorrowModal(bookId, button) {
+function openBorrowModal(bookId, button, bookTitle) {
   document.getElementById('borrowBookId').value = bookId;
+  const inputTitle = document.getElementById('borrowBookTitle');
+  if (inputTitle) inputTitle.value = bookTitle || '';
+  
   document.getElementById('expectedReturnDate').value = '';
   document.getElementById('borrowNote').value = '';
+  
+  const feePreview = document.getElementById('feePreview');
+  if (feePreview) feePreview.textContent = '';
+  
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  if (step1) step1.style.display = '';
+  if (step2) step2.style.display = 'none';
+
   currentBorrowButton = button;
   
   var borrowModal = new bootstrap.Modal(document.getElementById('borrowModal'));
@@ -165,10 +177,32 @@ function openBorrowModal(bookId, button) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  const dateInput = document.getElementById('expectedReturnDate');
+  if (dateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+    dateInput.addEventListener('change', function() {
+      const d = new Date(this.value);
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const days = Math.round((d - now) / 86400000);
+      const fee = days > 0 ? days * 3000 : 0;
+      const preview = document.getElementById('feePreview');
+      if (preview) {
+        preview.textContent = days > 0
+          ? `Ước tính: ${days} ngày × 3.000 VND = ${fee.toLocaleString('vi-VN')} VND`
+          : '';
+      }
+    });
+  }
+
   const confirmBtn = document.getElementById('confirmBorrowBtn');
+  const submitBtn = document.getElementById('btnSubmitBorrow');
+  let currentExpectedDate = '';
+  let currentNote = '';
+
   if (confirmBtn) {
     confirmBtn.addEventListener('click', function() {
-      const bookId = document.getElementById('borrowBookId').value;
       const expectedDate = document.getElementById('expectedReturnDate').value;
       const note = document.getElementById('borrowNote').value;
       
@@ -176,7 +210,59 @@ document.addEventListener('DOMContentLoaded', function() {
         alert("Vui lòng chọn ngày dự kiến trả!");
         return;
       }
+
+      const d = new Date(expectedDate);
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const days = Math.round((d - now) / 86400000);
       
+      if (days <= 0) {
+        alert('Ngày dự kiến trả phải lớn hơn ngày hiện tại!');
+        return;
+      }
+
+      currentExpectedDate = expectedDate;
+      currentNote = note;
+      const fee = days * 3000;
+
+      const bank_id = "MB";
+      const account_no = "0774504240205";
+      const account_name = "LE NGUYEN NHAT MINH";
+      let title = '';
+      const inputTitle = document.getElementById('borrowBookTitle');
+      if (inputTitle) title = inputTitle.value;
+      if (!title) title = 'Sach';
+      
+      const addInfo = "Muon sach " + title.substring(0, 20);
+      const qr_url = `https://img.vietqr.io/image/${bank_id}-${account_no}-compact2.jpg?amount=${fee}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(account_name)}`;
+
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      if (step1) step1.style.display = 'none';
+      if (step2) step2.style.display = '';
+
+      const qrImg = document.getElementById('qrImage');
+      if (qrImg) qrImg.src = qr_url;
+      const tFee = document.getElementById('qrTotalFee');
+      if (tFee) tFee.textContent = fee.toLocaleString('vi-VN') + ' VND';
+      const detail = document.getElementById('qrFeeDetail');
+      if (detail) detail.textContent = `${days} ngày × 3.000 VND/ngày`;
+      
+      const elAcc = document.getElementById('qrAccount');
+      if (elAcc) elAcc.textContent = account_no;
+      const elName = document.getElementById('qrName');
+      if (elName) elName.textContent = account_name;
+      const elCont = document.getElementById('qrContent');
+      if (elCont) elCont.textContent = addInfo;
+    });
+  }
+
+  if (submitBtn) {
+    submitBtn.addEventListener('click', function() {
+      const bookId = document.getElementById('borrowBookId').value;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Đang gửi...';
+
       fetch(`/book/${bookId}/borrow/`, {
         method: 'POST',
         headers: {
@@ -184,56 +270,60 @@ document.addEventListener('DOMContentLoaded', function() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          expected_return_date: expectedDate,
-          note: note
+          expected_return_date: currentExpectedDate,
+          note: currentNote
         })
       })
-      .then(response => response.json())
+      .then(r => r.json())
       .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '✅ Đã chuyển khoản, gửi yêu cầu';
+
         if (data.success) {
+          bootstrap.Modal.getInstance(document.getElementById('borrowModal')).hide();
           if (currentBorrowButton) {
-            currentBorrowButton.outerHTML = `
-              <button class="btn-view disabled" disabled>
-                <i class="bi bi-book"></i> Đã Mượn
-              </button>`;
+            currentBorrowButton.outerHTML = `<button class="btn-view disabled" disabled><i class="bi bi-clock"></i> Chờ duyệt</button>`;
           }
-          var modalEl = document.getElementById('borrowModal');
-          var modal = bootstrap.Modal.getInstance(modalEl);
-          modal.hide();
-          alert("Mượn sách thành công!");
+          alert('Đã gửi yêu cầu mượn sách. Vui lòng chờ admin duyệt!');
         } else {
           alert(data.message);
         }
       })
-      .catch(error => {
-        console.error('Lỗi:', error);
-        alert('Đã xảy ra lỗi khi mượn sách.');
+      .catch(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '✅ Đã chuyển khoản, gửi yêu cầu';
+        alert('Đã xảy ra lỗi, vui lòng thử lại.');
       });
     });
   }
 });
-document.getElementById("uploadForm").addEventListener("submit", function(e) {
-  e.preventDefault();
+const uploadForm = document.getElementById("uploadForm");
+if (uploadForm) {
+  uploadForm.addEventListener("submit", function(e) {
+    e.preventDefault();
 
-  const formData = new FormData();
-  const fileInput = document.getElementById("imageInput");
-  if (!fileInput.files.length) return;
+    const formData = new FormData();
+    const fileInput = document.getElementById("imageInput");
+    if (!fileInput || !fileInput.files.length) return;
 
-  formData.append("image", fileInput.files[0]);
+    formData.append("image", fileInput.files[0]);
 
-  fetch("{% url 'upload_cover' %}", {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": "{{ csrf_token }}"
-    },
-    body: formData
-  })
-  .then(res => res.text())
-  .then(html => {
-    document.getElementById("resultArea").innerHTML = html;
-  })
-  .catch(err => {
-    document.getElementById("resultArea").innerHTML = "Lỗi xử lý ảnh.";
-    console.error(err);
+    fetch("/search-image/", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": getCookie('csrftoken')
+      },
+      body: formData
+    })
+    .then(res => res.text())
+    .then(html => {
+      const resultArea = document.getElementById("resultArea");
+      if (resultArea) resultArea.innerHTML = html;
+    })
+    .catch(err => {
+      const resultArea = document.getElementById("resultArea");
+      if (resultArea) resultArea.innerHTML = "Lỗi xử lý ảnh.";
+      console.error(err);
+    });
   });
-});
+}

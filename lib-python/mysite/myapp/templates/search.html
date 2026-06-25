@@ -13,9 +13,11 @@
       crossorigin="anonymous"
     />
     <title>PTIT ELIB</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/search.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="{% static 'js/style.js' %}?v=2"></script>
   </head>
   <body>
     <!-- Header Top -->
@@ -47,9 +49,9 @@
       <ul class="menu">
         <li><a href="{% url 'home' %}">Trang chủ</a></li>
         <li>
-          <a href="#">Giới thiệu</a>
+          <a href="{% url 'intro' %}">Giới thiệu</a>
         </li>
-        <li><a href="#">Tin tức & Sự kiện</a></li>
+        <li><a href="https://ptit.edu.vn/tin-tuc-su-kien/tin-tuc/tin-tuc-chung/">Tin tức & Sự kiện</a></li>
         <li><a href="#">Liên hệ</a></li>
         <li>
           <a href="{% url 'logout' %}">Đăng Xuất</a>
@@ -61,11 +63,7 @@
       {% if request.user.is_authenticated %}
         <form action="{% url 'search' %}" method="GET" style="display: flex; align-items: center; width: 100%;">
           
-          <select class="pick" name="category" style="margin-right: 10px;">
-            <option value="all" {% if category == 'all' %}selected{% endif %}>Tất cả</option>
-            <option value="book" {% if category == 'book' %}selected{% endif %}>Sách</option>
-            <option value="giaotrinh" {% if category == 'giaotrinh' %}selected{% endif %}>Giáo Trình</option>
-          </select>
+
 
           <input class="timkiem" type="text" name="q" value="{{ query }}" placeholder="Nhập từ khóa tìm kiếm" required>
           <button class="search-button" type="submit">Tìm kiếm</button>
@@ -82,55 +80,60 @@
     </section>
 
 
-{% if category == "book" or category == "all" %}
   {% if books %}
-    <h5>Sách</h5>
-    <div class="result-list">
-      {% for book in books %}
-        <div class="result-item">
-          {% if book.image %}
-            <img src="{{ book.image.url }}" alt="Bìa sách {{ book.title }}">
-          {% else %}
-            <img src="{% static 'images/placeholder.png' %}" alt="Không có ảnh bìa">
-          {% endif %}
-          <div class="result-info">
-            <h4><a href="{% url 'book_detail' book.id %}">{{ book.title }}</a></h4>
-            <p><strong>Tác giả:</strong> {{ book.author }}</p>
-            <p><strong>Nhà xuất bản:</strong> {{ book.publisher }}</p>
-            {% if book.collection %}
-              <p><strong>Bộ sưu tập:</strong> {{ book.collection }}</p>
-            {% endif %}
+    <main style="display:block; padding-top:20px;">
+      <section class="favorite-books-section" style="background:transparent; padding:20px 0;">
+        <div class="container" style="max-width:1200px; padding:0;">
+          <div class="section-title text-center mb-5" style="margin-bottom: 25px !important;">
+            <h2 style="color:#c00; font-weight:bold; font-size: 28px;">KẾT QUẢ TÌM KIẾM</h2>
           </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <h5>Không tìm thấy sách phù hợp.</h5>
-  {% endif %}
-{% endif %}
 
-{% if category == "giaotrinh" or category == "all" %}
-  {% if giaotrinhs %}
-    <h5>Giáo trình</h5>
-    <div class="result-list">
-      {% for giaotrinh in giaotrinhs %}
-        <div class="result-item">
-          {% if giaotrinh.image %}
-            <img src="{{ giaotrinh.image.url }}" alt="{{ giaotrinh.title }}">
-          {% else %}
-            <img src="{% static 'images/default-book.jpg' %}" alt="No image available">
-          {% endif %}
-          <div class="result-info">
-            <h4><a href="{% url 'giaotrinh_detail' giaotrinh.id %}">{{ giaotrinh.title }}</a></h4>
-            <p><strong>Tác giả:</strong> {{ giaotrinh.author }}</p>
+          <div class="row book-row">
+            {% for book in books %}
+            <div class="col-md-3 col-sm-6 mb-4">
+              <div class="book-item">
+                <div class="book-cover">
+                  {% if book.image %}
+                    <img src="{{ book.image.url }}" alt="{{ book.title }}">
+                  {% else %}
+                    <img src="{% static 'images/default-book-cover.jpg' %}" alt="{{ book.title }}">
+                  {% endif %}
+                  <div class="book-overlay">
+                    <button class="btn-view" onclick="openBorrowModal({{ book.id }}, this, '{{ book.title|escapejs }}')">
+                      <i class="bi bi-book"></i> Mượn sách
+                    </button>
+                  </div>
+                </div>
+                <div class="book-info">
+                  <h3>{{ book.title }}</h3>
+                  <p class="author">{{ book.author }}</p>
+                  <div class="rating">
+                    {% for i in "12345" %}
+                      {% if i|add:"0" <= book.rating|add:"0" %}
+                        <i class="bi bi-star-fill"></i>
+                      {% elif i|add:"0" <= book.rating|add:"0.5" %}
+                        <i class="bi bi-star-half"></i>
+                      {% else %}
+                        <i class="bi bi-star"></i>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <a href="{% url 'book_detail' book.id %}" class="btn-detail-below">
+                    <i class="bi bi-eye"></i> Xem chi tiết
+                  </a>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
           </div>
         </div>
-      {% endfor %}
-    </div>
+      </section>
+    </main>
   {% else %}
-    <h5>Không tìm thấy giáo trình phù hợp.</h5>
+    <div class="container mt-4 mb-5 text-center">
+      <h5 class="text-muted">Không tìm thấy sách phù hợp.</h5>
+    </div>
   {% endif %}
-{% endif %}
 
   {% if recommended_books %}
   <section class="recommended-books-section">
@@ -188,6 +191,80 @@
     </div>
   </section>
   {% endif %}
+    <!-- Borrow Modal -->
+    <div class="modal fade" id="borrowModal" tabindex="-1" aria-labelledby="borrowModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+          <!-- Bước 1: Điền thông tin -->
+          <div id="step1">
+            <div class="modal-header" style="background:#8B0000;color:#fff;">
+              <h5 class="modal-title" id="borrowModalLabel">
+                📚 Bước 1: Thông tin mượn sách
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <form id="borrowForm">
+                <input type="hidden" id="borrowBookId">
+                <input type="hidden" id="borrowBookTitle">
+                <div class="mb-3">
+                  <label for="expectedReturnDate" class="form-label fw-semibold">Ngày dự kiến trả (*)</label>
+                  <input type="date" class="form-control" id="expectedReturnDate" required>
+                  <div id="feePreview" style="font-size:13px;color:#8B0000;margin-top:6px;font-weight:600;"></div>
+                </div>
+                <div class="mb-3">
+                  <label for="borrowNote" class="form-label fw-semibold">Ghi chú thêm</label>
+                  <textarea class="form-control" id="borrowNote" rows="3" placeholder="Mục đích mượn, tình trạng sách..."></textarea>
+                </div>
+              </form>
+              <div style="background:#fef3c7;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;">
+                ⚠️ <strong>Phí mượn:</strong> 3.000 VND / ngày. Vui lòng chuyển khoản sau khi gửi yêu cầu.
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="button" class="btn btn-danger" id="confirmBorrowBtn">
+                Tiếp theo → Thanh toán
+              </button>
+            </div>
+          </div>
+
+          <!-- Bước 2: QR chuyển tiền -->
+          <div id="step2" style="display:none;">
+            <div class="modal-header" style="background:#16a34a;color:#fff;">
+              <h5 class="modal-title">✅ Bước 2: Thanh toán phí mượn sách</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="text-align:center;padding:24px 20px;">
+              <div style="background:#f0fdf4;border-radius:12px;padding:16px;margin-bottom:16px;">
+                <div style="font-size:13px;color:#6b7280;margin-bottom:4px;">Tổng phí mượn</div>
+                <div id="qrTotalFee" style="font-size:28px;font-weight:800;color:#16a34a;"></div>
+                <div id="qrFeeDetail" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
+              </div>
+              <img id="qrImage" src="" alt="QR chuyển khoản"
+                style="max-width:220px;width:100%;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);margin-bottom:16px;">
+              <div style="background:#f9fafb;border-radius:10px;padding:12px 16px;text-align:left;font-size:13px;">
+                <div style="margin-bottom:4px;"><span style="color:#9ca3af;">Ngân hàng:</span> <strong>MB Bank</strong></div>
+                <div style="margin-bottom:4px;"><span style="color:#9ca3af;">Số tài khoản:</span> <strong id="qrAccount"></strong></div>
+                <div style="margin-bottom:4px;"><span style="color:#9ca3af;">Tên chủ TK:</span> <strong id="qrName"></strong></div>
+                <div><span style="color:#9ca3af;">Nội dung:</span> <strong id="qrContent" style="color:#8B0000;"></strong></div>
+              </div>
+              <div style="margin-top:14px;background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;">
+                ⏳ <strong>Chờ admin xác nhận</strong> sau khi bạn chuyển khoản (trong vòng 24h).
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='';">Quay lại</button>
+              <button type="button" class="btn btn-success" id="btnSubmitBorrow">
+                ✅ Đã chuyển khoản, gửi yêu cầu
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
 
 
  <!-- Footer -->
@@ -244,185 +321,5 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
-      <style>
-        .search-results {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-        
-        .result-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .result-item {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-        }
-        
-        .result-item img {
-            width: 100px;
-            height: 150px;
-            object-fit: cover;
-            margin-right: 15px;
-        }
-        
-        .result-info {
-            flex: 1;
-        }
-        
-        .result-info h4 a {
-            color: #2c3e50;
-            text-decoration: none;
-        }
-        
-        .result-info p {
-            margin: 5px 0;
-            color: #555;
-        }
-    </style>
   </body>
 </html>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize book slider functionality if it exists
-      const sliders = document.querySelectorAll('.book-slider');
-      
-      sliders.forEach(slider => {
-        const container = slider.closest('.book-slider-container');
-        if (!container) return;
-        
-        const prevBtn = container.querySelector('.prev-btn');
-        const nextBtn = container.querySelector('.next-btn');
-        const dotsContainer = container.parentElement.querySelector('.slider-dots');
-        
-        // Skip if elements not found
-        if (!prevBtn || !nextBtn || !dotsContainer) return;
-        
-        // Calculate dimensions
-        const bookWidth = slider.querySelector('.book-item').offsetWidth + 20; // width + gap
-        const visibleWidth = slider.offsetWidth;
-        const itemsPerPage = Math.floor(visibleWidth / bookWidth);
-        const totalItems = slider.querySelectorAll('.book-item').length;
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        
-        // Create dots
-        for (let i = 0; i < totalPages; i++) {
-          const dot = document.createElement('span');
-          dot.classList.add('dot');
-          if (i === 0) dot.classList.add('active');
-          dot.dataset.index = i;
-          dotsContainer.appendChild(dot);
-          
-          dot.addEventListener('click', () => {
-            currentPage = i;
-            updateSlider();
-          });
-        }
-        
-        let currentPage = 0;
-        
-        // Update slider to current page
-        function updateSlider() {
-          const scrollPosition = currentPage * visibleWidth;
-          slider.scrollLeft = scrollPosition;
-          
-          // Update dots
-          dotsContainer.querySelectorAll('.dot').forEach((dot, index) => {
-            if (index === currentPage) {
-              dot.classList.add('active');
-            } else {
-              dot.classList.remove('active');
-            }
-          });
-          
-          // Update button states
-          prevBtn.disabled = currentPage === 0;
-          prevBtn.style.opacity = currentPage === 0 ? '0.5' : '1';
-          
-          nextBtn.disabled = currentPage === totalPages - 1;
-          nextBtn.style.opacity = currentPage === totalPages - 1 ? '0.5' : '1';
-        }
-        
-        // Initial setup
-        updateSlider();
-        
-        // Button event listeners
-        prevBtn.addEventListener('click', () => {
-          if (currentPage > 0) {
-            currentPage--;
-            updateSlider();
-          }
-        });
-        
-        nextBtn.addEventListener('click', () => {
-          if (currentPage < totalPages - 1) {
-            currentPage++;
-            updateSlider();
-          }
-        });
-        
-        // Handle window resize
-        window.addEventListener('resize', () => {
-          // Recalculate dimensions
-          const newBookWidth = slider.querySelector('.book-item').offsetWidth + 20;
-          const newVisibleWidth = slider.offsetWidth;
-          const newItemsPerPage = Math.floor(newVisibleWidth / newBookWidth);
-          const newTotalPages = Math.ceil(totalItems / newItemsPerPage);
-          
-          // Reset dots
-          dotsContainer.innerHTML = '';
-          for (let i = 0; i < newTotalPages; i++) {
-            const dot = document.createElement('span');
-            dot.classList.add('dot');
-            if (i === currentPage) dot.classList.add('active');
-            dot.dataset.index = i;
-            dotsContainer.appendChild(dot);
-            
-            dot.addEventListener('click', () => {
-              currentPage = i;
-              updateSlider();
-            });
-          }
-          
-          // Ensure current page is valid
-          if (currentPage >= newTotalPages) {
-            currentPage = newTotalPages - 1;
-          }
-          
-          // Update slider
-          updateSlider();
-        });
-      });
-    });
-    document.getElementById("uploadForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-
-  const formData = new FormData();
-  const fileInput = document.getElementById("imageInput");
-  if (!fileInput.files.length) return;
-
-  formData.append("image", fileInput.files[0]);
-
-  fetch("{% url 'upload_cover' %}", {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": "{{ csrf_token }}"
-    },
-    body: formData
-  })
-  .then(res => res.text())
-  .then(html => {
-    document.getElementById("resultArea").innerHTML = html;
-  })
-  .catch(err => {
-    document.getElementById("resultArea").innerHTML = "Lỗi xử lý ảnh.";
-    console.error(err);
-  });
-});
-</script>

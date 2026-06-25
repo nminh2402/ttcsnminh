@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yêu cầu mượn sách – PTIT ELIB</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root { --primary: #8B0000; --sidebar-w: 240px; --bg: #f5f6fa; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
+    .sidebar { width: var(--sidebar-w); background: #1a1a2e; color: #fff; display: flex; flex-direction: column; min-height: 100vh; position: fixed; top: 0; left: 0; z-index: 100; }
+    .sidebar-brand { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,.1); font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .sidebar-brand .brand-icon { background: var(--primary); width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .sidebar-nav { flex: 1; padding: 16px 0; }
+    .nav-section { font-size: 11px; color: rgba(255,255,255,.4); padding: 12px 16px 6px; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-link-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; color: rgba(255,255,255,.75); text-decoration: none; font-size: 14px; transition: all .2s; border-radius: 8px; margin: 2px 8px; }
+    .nav-link-item:hover, .nav-link-item.active { background: rgba(255,255,255,.1); color: #fff; }
+    .nav-link-item.active { background: var(--primary); }
+    .nav-link-item i { width: 18px; text-align: center; }
+    .badge-count { background: #dc2626; color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 11px; font-weight: 700; margin-left: auto; }
+
+    .main-content { margin-left: var(--sidebar-w); flex: 1; }
+    .topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar h1 { font-size: 20px; font-weight: 700; color: #1f2937; }
+    .admin-badge { background: var(--primary); color: #fff; border-radius: 20px; padding: 4px 12px; font-size: 13px; font-weight: 600; }
+    .page-body { padding: 28px; }
+
+    .table-card { background: #fff; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,.06); overflow: hidden; }
+    .table-header { padding: 18px 22px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
+    .table-title { font-size: 16px; font-weight: 700; color: #1f2937; display: flex; align-items: center; gap: 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { font-size: 12px; color: #9ca3af; text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; font-weight: 600; text-align: left; background: #fafafa; }
+    td { padding: 13px 16px; font-size: 14px; color: #374151; border-bottom: 1px solid #f9fafb; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,var(--primary),#c0392b); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+    .book-thumb { width: 38px; height: 50px; object-fit: cover; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+    .no-thumb { width: 38px; height: 50px; background: #f3f4f6; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #d1d5db; font-size: 18px; }
+    .note-text { max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #6b7280; font-style: italic; }
+
+    .btn-approve { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; background: #16a34a; color: #fff; border: none; cursor: pointer; transition: opacity .2s; }
+    .btn-approve:hover { opacity: .85; }
+    .btn-reject  { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; background: #dc2626; color: #fff; border: none; cursor: pointer; transition: opacity .2s; }
+    .btn-reject:hover { opacity: .85; }
+
+    .empty-box { text-align: center; padding: 60px 20px; color: #9ca3af; }
+    .empty-box i { font-size: 48px; display: block; margin-bottom: 12px; color: #d1d5db; }
+
+    .overdue-tag { background: #fef2f2; color: #dc2626; border-radius: 8px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+    .date-tag { background: #eff6ff; color: #2563eb; border-radius: 8px; padding: 2px 8px; font-size: 12px; font-weight: 600; }
+    .fee-tag  { background: #fef9c3; color: #854d0e; border-radius: 8px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">📚</div><span>PTIT ELIB</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Quản trị</div>
+    <a href="{% url 'admin_dashboard' %}" class="nav-link-item"><i class="fas fa-chart-bar"></i> Dashboard</a>
+    <a href="{% url 'manage_books' %}" class="nav-link-item"><i class="fas fa-book"></i> Quản lý sách</a>
+
+    <a href="{% url 'manage_users' %}" class="nav-link-item"><i class="fas fa-users"></i> Người dùng</a>
+    <a href="{% url 'pending_borrows' %}" class="nav-link-item active">
+      <i class="fas fa-clock"></i> Yêu cầu mượn
+      {% if pending_count > 0 %}<span class="badge-count">{{ pending_count }}</span>{% endif %}
+    </a>
+    <div class="nav-section">Hệ thống</div>
+    <a href="{% url 'home' %}" class="nav-link-item"><i class="fas fa-home"></i> Trang chủ</a>
+    <a href="/admin/" class="nav-link-item"><i class="fas fa-cog"></i> Django Admin</a>
+    <a href="{% url 'logout' %}" class="nav-link-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+  </nav>
+</aside>
+
+<div class="main-content">
+  <div class="topbar">
+    <h1>🕐 Yêu cầu mượn sách chờ duyệt</h1>
+    <span class="admin-badge"><i class="fas fa-shield-alt me-1"></i>{{ request.user.username }}</span>
+  </div>
+
+  <div class="page-body">
+    {% if messages %}
+    <div style="margin-bottom:18px;">
+      {% for msg in messages %}
+      <div class="alert alert-{% if 'Đã duyệt' in msg.message or 'thành công' in msg.message %}success{% elif 'Đã từ chối' in msg.message %}warning{% else %}danger{% endif %} alert-dismissible fade show" role="alert">
+        {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="table-card">
+      <div class="table-header" style="flex-wrap:wrap; gap:10px;">
+        <div class="table-title">
+          <i class="fas fa-clock" style="color:var(--primary);"></i>
+          Danh sách yêu cầu chờ duyệt
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:13px;color:#6b7280;">{{ pending_count }} yêu cầu</span>
+          {% if pending_list %}
+          <form method="POST" action="{% url 'approve_all_borrows' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-approve" onclick="return confirm('Bạn có chắc chắn muốn duyệt TẤT CẢ yêu cầu đang chờ?')">
+              <i class="fas fa-check-double"></i> Duyệt tất cả
+            </button>
+          </form>
+          <form method="POST" action="{% url 'reject_all_borrows' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-reject" onclick="return confirm('Bạn có chắc chắn muốn từ chối TẤT CẢ yêu cầu đang chờ?')">
+              <i class="fas fa-times-circle"></i> Từ chối tất cả
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if pending_list %}
+      <table>
+        <thead>
+          <tr>
+            <th>Người mượn</th>
+            <th>Sách</th>
+            <th>Ghi chú</th>
+            <th>Ngày gửi</th>
+            <th>Hạn trả</th>
+            <th>Phí ước tính</th>
+            <th style="text-align:center;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rec in pending_list %}
+          {% with days=rec.expected_return_date|timeuntil %}
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="avatar">{{ rec.user.username|first|upper }}</div>
+                <div>
+                  <div style="font-weight:600;">{{ rec.user.username }}</div>
+                  <div style="font-size:12px;color:#9ca3af;">{{ rec.user.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                {% if rec.book.image %}
+                <img src="{{ rec.book.image.url }}" class="book-thumb" alt="bìa">
+                {% else %}
+                <div class="no-thumb"><i class="fas fa-book"></i></div>
+                {% endif %}
+                <div>
+                  <div style="font-weight:600;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ rec.book.title }}</div>
+                  <div style="font-size:12px;color:#9ca3af;">{{ rec.book.author }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              {% if rec.note %}
+              <span class="note-text" title="{{ rec.note }}">{{ rec.note }}</span>
+              {% else %}
+              <span style="color:#d1d5db;">—</span>
+              {% endif %}
+            </td>
+            <td style="color:#6b7280;font-size:13px;">{{ rec.borrowed_at|date:"d/m/Y H:i" }}</td>
+            <td>
+              {% if rec.expected_return_date %}
+              <span class="date-tag">{{ rec.expected_return_date|date:"d/m/Y" }}</span>
+              {% else %}
+              <span style="color:#d1d5db;">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if rec.expected_return_date %}
+              {% widthratio rec.borrowed_at|timesince:rec.expected_return_date 1 3000 as fee %}
+              <span class="fee-tag">
+                {% if rec.expected_return_date %}
+                  {% now "Y-m-d" as today %}
+                  Xem thông tin
+                {% endif %}
+              </span>
+              {% else %}—{% endif %}
+            </td>
+            <td style="text-align:center;white-space:nowrap;">
+              <form method="POST" action="{% url 'approve_borrow' rec.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-approve" onclick="return confirm('Duyệt yêu cầu mượn sách \"{{ rec.book.title|escapejs }}\" của {{ rec.user.username|escapejs }}?')">
+                  <i class="fas fa-check"></i> Duyệt
+                </button>
+              </form>
+              <form method="POST" action="{% url 'reject_borrow' rec.id %}" style="display:inline;margin-left:6px;">
+                {% csrf_token %}
+                <button type="submit" class="btn-reject" onclick="return confirm('Từ chối yêu cầu mượn của {{ rec.user.username|escapejs }}?')">
+                  <i class="fas fa-times"></i> Từ chối
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-box">
+        <i class="fas fa-check-circle" style="color:#16a34a;"></i>
+        <strong style="font-size:18px;color:#374151;display:block;margin-bottom:8px;">Không có yêu cầu chờ duyệt!</strong>
+        <span>Tất cả yêu cầu mượn sách đã được xử lý.</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

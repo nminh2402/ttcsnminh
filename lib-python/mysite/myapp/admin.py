@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book, Giaotrinh, UserHistory, BorrowRecord
+from .models import Book, UserHistory, BorrowRecord, BookReview
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -11,10 +11,7 @@ class BookAdmin(admin.ModelAdmin):
     def has_pdf(self, obj):
         return bool(obj.pdf_file)
 
-@admin.register(Giaotrinh)
-class GiaotrinhAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'uri')
-    search_fields = ('title', 'author')
+
 
 @admin.register(UserHistory)
 class UserHistoryAdmin(admin.ModelAdmin):
@@ -26,3 +23,10 @@ class BorrowRecordAdmin(admin.ModelAdmin):
     list_display = ('user', 'book', 'borrowed_at', 'expected_return_date', 'returned_at', 'is_borrowed')
     list_filter = ('borrowed_at', 'expected_return_date', 'returned_at', 'user')
     search_fields = ('user__username', 'book__title', 'note')
+
+@admin.register(BookReview)
+class BookReviewAdmin(admin.ModelAdmin):
+    list_display = ('user', 'book', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('user__username', 'book__title', 'comment')
+

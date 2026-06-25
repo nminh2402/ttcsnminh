@@ -126,8 +126,10 @@
   </div>
   <ul class="menu">
     <li><a href="{% url 'home' %}">Trang chủ</a></li>
+    <li><a href="{% url 'admin_dashboard' %}" style="color:#8B0000;font-weight:700">📊 Dashboard</a></li>
     <li><a href="{% url 'manage_books' %}" style="color:#8B0000;font-weight:700">Quản lý sách</a></li>
-    <li><a href="{% url 'profile' %}">Trang cá nhân</a></li>
+
+    <li><a href="{% url 'manage_users' %}">Người dùng</a></li>
     <li><a href="{% url 'logout' %}">Đăng xuất</a></li>
   </ul>
 </div>
@@ -157,8 +159,9 @@
 
   <!-- Stats -->
   <div class="stats">
-    <div class="stat-card"><div class="val">{{ books.count }}</div><div class="lbl">Tổng số sách</div></div>
-    <div class="stat-card"><div class="val">{{ books|length }}</div><div class="lbl">Kết quả hiển thị</div></div>
+    <div class="stat-card"><div class="val">{{ page_obj.paginator.count }}</div><div class="lbl">Tổng số sách</div></div>
+    <div class="stat-card"><div class="val">{{ page_obj|length }}</div><div class="lbl">Trang này</div></div>
+    <div class="stat-card"><div class="val">{{ page_obj.paginator.num_pages }}</div><div class="lbl">Số trang</div></div>
   </div>
 
   <!-- Search + filter -->
@@ -180,14 +183,13 @@
           <th>Tác giả</th>
           <th>NXB</th>
           <th>SL</th>
-          <th>PDF</th>
           <th style="text-align:center">Thao tác</th>
         </tr>
       </thead>
       <tbody id="bookTableBody">
-        {% for book in books %}
+        {% for book in page_obj %}
         <tr data-title="{{ book.title|lower }}" data-author="{{ book.author|lower }}" data-publisher="{{ book.publisher|lower }}">
-          <td style="color:#9ca3af;font-size:12px">{{ forloop.counter }}</td>
+          <td style="color:#9ca3af;font-size:12px">{{ forloop.counter0|add:page_obj.start_index }}</td>
           <td>
             {% if book.image %}
               <img src="{{ book.image.url }}" class="book-thumb" alt="bìa">
@@ -195,17 +197,10 @@
               <div class="no-thumb">N/A</div>
             {% endif %}
           </td>
-          <td><strong>{{ book.title }}</strong></td>
+          <td><strong>{{ book.title }}</strong><br><small style="color:#9ca3af;">{{ book.get_category_display }}</small></td>
           <td>{{ book.author }}</td>
           <td>{{ book.publisher }}</td>
-          <td><strong>{{ book.quantity }}</strong></td>
-          <td>
-            {% if book.pdf_file %}
-              <span class="badge badge-yes">✓ Có</span>
-            {% else %}
-              <span class="badge badge-no">Chưa có</span>
-            {% endif %}
-          </td>
+          <td><strong>∞</strong></td>
           <td style="text-align:center;white-space:nowrap">
             <button class="btn btn-edit" onclick="openEditModal({{ book.id }})">✏️ Sửa</button>
             <button class="btn btn-delete" onclick="openDeleteModal({{ book.id }}, '{{ book.title|escapejs }}')">🗑️ Xóa</button>
@@ -217,6 +212,26 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <div style="display:flex;justify-content:center;gap:8px;margin-top:20px;flex-wrap:wrap;">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1.5px solid #d1d5db;text-decoration:none;color:#374151;font-weight:600;font-size:14px;">‹</a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#8B0000;color:#fff;font-weight:700;font-size:14px;">{{ num }}</span>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+      <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1.5px solid #d1d5db;text-decoration:none;color:#374151;font-weight:600;font-size:14px;">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1.5px solid #d1d5db;text-decoration:none;color:#374151;font-weight:600;font-size:14px;">›</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
 </div>
 
 <!-- ========== MODAL THÊM / SỬA SÁCH ========== -->
@@ -251,18 +266,50 @@
             <input type="number" name="quantity" id="f_quantity" value="1" min="0">
           </div>
           <div class="form-group">
-            <label>Link đọc online (URL)</label>
-            <input type="url" name="uri" id="f_uri" placeholder="https://...">
+            <label>Thể loại</label>
+            <select name="category" id="f_category">
+              <option value="cong_nghe">Công nghệ - CNTT</option>
+              <option value="van_hoc">Văn học</option>
+              <option value="kinh_te">Kinh tế</option>
+              <option value="ngoai_ngu">Ngoại ngữ</option>
+              <option value="khoa_hoc">Khoa học tự nhiên</option>
+              <option value="xa_hoi">Khoa học xã hội</option>
+              <option value="giao_duc">Giáo dục - Tâm lý</option>
+              <option value="ky_thuat">Kỹ thuật - Công nghệ</option>
+              <option value="khac" selected>Khác</option>
+            </select>
           </div>
-          <div class="form-group">
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Mô tả sách</label>
+            <textarea name="description" id="f_description" rows="3" style="width:100%;padding:10px 13px;border:1.5px solid #d1d5db;border-radius:8px;font-size:13.5px;outline:none;font-family:'Roboto',sans-serif;resize:vertical;" placeholder="Mô tả ngắn về nội dung sách..."></textarea>
+          </div>
+          <div class="form-group" style="grid-column:1/-1">
+            <label>Link đọc online / Tệp PDF sách</label>
+            <div style="display:flex; gap:20px; margin-bottom:8px; font-size:13.5px;">
+              <label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-weight:normal;">
+                <input type="radio" name="pdf_source" id="pdf_source_url" value="url" checked onchange="togglePdfSource()" style="width:auto; margin:0;">
+                Nhập liên kết (URL)
+              </label>
+              <label style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-weight:normal;">
+                <input type="radio" name="pdf_source" id="pdf_source_file" value="file" onchange="togglePdfSource()" style="width:auto; margin:0;">
+                Tải file từ máy tính (.pdf)
+              </label>
+            </div>
+            
+            <div id="pdf_url_container">
+              <input type="url" name="uri" id="f_uri" placeholder="https://...">
+            </div>
+            
+            <div id="pdf_file_container" style="display:none;">
+              <input type="file" name="pdf_file" id="f_pdf_file" accept="application/pdf">
+              <div class="current-file" id="cur_pdf"></div>
+            </div>
+          </div>
+
+          <div class="form-group" style="grid-column:1/-1">
             <label>Ảnh bìa</label>
             <input type="file" name="image" id="f_image" accept="image/*">
             <div class="current-file" id="cur_image"></div>
-          </div>
-          <div class="form-group">
-            <label>File PDF</label>
-            <input type="file" name="pdf_file" id="f_pdf" accept=".pdf">
-            <div class="current-file" id="cur_pdf"></div>
           </div>
         </div>
         <div class="form-error" id="err_general" style="margin-top:6px"></div>
@@ -312,6 +359,13 @@ function openModal(id){ document.getElementById(id).classList.add('open') }
 function closeModal(id){ document.getElementById(id).classList.remove('open') }
 function closeOnOverlay(e, id){ if(e.target.id===id) closeModal(id) }
 
+// ── Toggle PDF Source ──────────────────────────────────────────
+function togglePdfSource() {
+  const isUrl = document.getElementById('pdf_source_url').checked;
+  document.getElementById('pdf_url_container').style.display = isUrl ? 'block' : 'none';
+  document.getElementById('pdf_file_container').style.display = isUrl ? 'none' : 'block';
+}
+
 // ── Modal Thêm ───────────────────────────────────────────────────
 function openAddModal(){
   document.getElementById('modalTitle').textContent = 'Thêm sách mới';
@@ -321,9 +375,11 @@ function openAddModal(){
   ['f_title','f_author','f_publisher','f_uri'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f_quantity').value = 1;
   document.getElementById('f_image').value = '';
-  document.getElementById('f_pdf').value = '';
   document.getElementById('cur_image').innerHTML = '';
+  document.getElementById('f_pdf_file').value = '';
   document.getElementById('cur_pdf').innerHTML = '';
+  document.getElementById('pdf_source_url').checked = true;
+  togglePdfSource();
   clearErrors();
   openModal('bookModal');
 }
@@ -340,12 +396,22 @@ function openEditModal(bookId){
       document.getElementById('f_publisher').value = data.publisher;
       document.getElementById('f_uri').value = data.uri;
       document.getElementById('f_quantity').value = data.quantity;
+      if(document.getElementById('f_category')) document.getElementById('f_category').value = data.category || 'khac';
+      if(document.getElementById('f_description')) document.getElementById('f_description').value = data.description || '';
       document.getElementById('f_image').value = '';
-      document.getElementById('f_pdf').value = '';
       document.getElementById('cur_image').innerHTML = data.image_url
         ? `Ảnh hiện tại: <a href="${data.image_url}" target="_blank">xem</a> (bỏ trống = giữ nguyên)` : '';
+      document.getElementById('f_pdf_file').value = '';
       document.getElementById('cur_pdf').innerHTML = data.pdf_url
-        ? `PDF hiện tại: <a href="${data.pdf_url}" target="_blank">xem</a> (bỏ trống = giữ nguyên)` : '';
+        ? `File hiện tại: <a href="${data.pdf_url}" target="_blank">xem PDF</a> (bỏ trống = giữ nguyên)` : '';
+      
+      if (data.pdf_url) {
+        document.getElementById('pdf_source_file').checked = true;
+      } else {
+        document.getElementById('pdf_source_url').checked = true;
+      }
+      togglePdfSource();
+      
       clearErrors();
       openModal('bookModal');
     });

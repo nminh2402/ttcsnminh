@@ -12,7 +12,7 @@
       crossorigin="anonymous"
     />
     <title>PTIT ELIB</title>
-    <script src="{% static 'js/style.js' %}"></script>
+    <script src="{% static 'js/style.js' %}?v=2"></script>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -53,8 +53,13 @@
         <li>
           <a href="{% url 'intro' %}">Giới thiệu</a>
         </li>
-        <li><a href="https://ptit.edu.vn/tin-tuc-su-kien/tin-tuc/tin-tuc-chung">Tin tức & Sự kiện</a></li>
+        <li><a href="https://ptit.edu.vn/tin-tuc-su-kien/tin-tuc/tin-tuc-chung/">Tin tức & Sự kiện</a></li>
         {% if request.user.is_staff %}
+        <li>
+          <a href="{% url 'admin_dashboard' %}" style="color:#8B0000;font-weight:700;background:rgba(139,0,0,.08);padding:4px 10px;border-radius:6px;">
+            📊 Dashboard
+          </a>
+        </li>
         <li>
           <a href="{% url 'manage_books' %}" style="color:#8B0000;font-weight:700;background:rgba(139,0,0,.08);padding:4px 10px;border-radius:6px;">
             ⚙️ Quản lý sách
@@ -92,21 +97,12 @@
       {% if request.user.is_authenticated %}
         <form action="{% url 'search' %}" method="GET" style="display: flex; align-items: center; width: 100%;">
           
-          <select class="pick" name="category" style="margin-right: 10px;">
-            <option value="all" {% if category == 'all' %}selected{% endif %}>Tất cả</option>
-            <option value="book" {% if category == 'book' %}selected{% endif %}>Sách</option>
-            <option value="giaotrinh" {% if category == 'giaotrinh' %}selected{% endif %}>Giáo Trình</option>
-          </select>
+
 
           <input class="timkiem" type="text" name="q" value="{{ query }}" placeholder="Nhập từ khóa tìm kiếm" required>
           <button class="search-button" type="submit">Tìm kiếm</button>
 
-          <!-- Biểu tượng camera -->
-          <!-- Nút máy ảnh -->
-          <!-- Nút camera mở modal -->
-          <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#imageModal">
-            <i class="fa fa-camera"></i>
-          </button>
+
         
         </form>
       {% else %}
@@ -251,15 +247,9 @@
             {% endif %}
 
             <div class="book-overlay">
-              {% if book.quantity > 0 %}
-                <button class="btn-view" onclick="openBorrowModal({{ book.id }}, this)">
-                  <i class="bi bi-book"></i> Mượn sách
-                </button>
-              {% else %}
-                <button class="btn-view disabled" disabled>
-                  <i class="bi bi-book"></i> Hết sách
-                </button>
-              {% endif %}
+              <button class="btn-view" onclick="openBorrowModal({{ book.id }}, this, '{{ book.title|escapejs }}')">
+                <i class="bi bi-book"></i> Mượn sách
+              </button>
             </div>
           </div>
 
@@ -315,15 +305,9 @@
                 <img src="{% static 'images/default-book-cover.jpg' %}" alt="{{ book.title }}">
               {% endif %}
               <div class="book-overlay">
-                {% if book.quantity > 0 %}
-                  <button class="btn-view" onclick="openBorrowModal({{ book.id }}, this)">
-                    <i class="bi bi-book"></i> Mượn sách
-                  </button>
-                {% else %}
-                  <button class="btn-view disabled" disabled>
-                    <i class="bi bi-book"></i> Hết sách
-                  </button>
-                {% endif %}
+                <button class="btn-view" onclick="openBorrowModal({{ book.id }}, this, '{{ book.title|escapejs }}')">
+                  <i class="bi bi-book"></i> Mượn sách
+                </button>
               </div>
             </div>
             <div class="book-info">
@@ -399,27 +383,73 @@
   <div class="modal fade" id="borrowModal" tabindex="-1" aria-labelledby="borrowModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="borrowModalLabel">Thông tin mượn sách</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="borrowForm">
-            <input type="hidden" id="borrowBookId">
-            <div class="mb-3">
-              <label for="expectedReturnDate" class="form-label">Ngày dự kiến trả (*)</label>
-              <input type="date" class="form-control" id="expectedReturnDate" required>
+
+        <!-- Bước 1: Điền thông tin -->
+        <div id="step1">
+          <div class="modal-header" style="background:#8B0000;color:#fff;">
+            <h5 class="modal-title" id="borrowModalLabel">
+              📚 Bước 1: Thông tin mượn sách
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="borrowForm">
+              <input type="hidden" id="borrowBookId">
+              <input type="hidden" id="borrowBookTitle">
+              <div class="mb-3">
+                <label for="expectedReturnDate" class="form-label fw-semibold">Ngày dự kiến trả (*)</label>
+                <input type="date" class="form-control" id="expectedReturnDate" required>
+                <div id="feePreview" style="font-size:13px;color:#8B0000;margin-top:6px;font-weight:600;"></div>
+              </div>
+              <div class="mb-3">
+                <label for="borrowNote" class="form-label fw-semibold">Ghi chú thêm</label>
+                <textarea class="form-control" id="borrowNote" rows="3" placeholder="Mục đích mượn, tình trạng sách..."></textarea>
+              </div>
+            </form>
+            <div style="background:#fef3c7;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;">
+              ⚠️ <strong>Phí mượn:</strong> 3.000 VND / ngày. Vui lòng chuyển khoản sau khi gửi yêu cầu.
             </div>
-            <div class="mb-3">
-              <label for="borrowNote" class="form-label">Ghi chú thêm</label>
-              <textarea class="form-control" id="borrowNote" rows="3" placeholder="Mục đích mượn, tình trạng sách..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button type="button" class="btn btn-danger" id="confirmBorrowBtn">
+              Tiếp theo → Thanh toán
+            </button>
+          </div>
+        </div>
+
+        <!-- Bước 2: QR chuyển tiền -->
+        <div id="step2" style="display:none;">
+          <div class="modal-header" style="background:#16a34a;color:#fff;">
+            <h5 class="modal-title">✅ Bước 2: Thanh toán phí mượn sách</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" style="text-align:center;padding:24px 20px;">
+            <div style="background:#f0fdf4;border-radius:12px;padding:16px;margin-bottom:16px;">
+              <div style="font-size:13px;color:#6b7280;margin-bottom:4px;">Tổng phí mượn</div>
+              <div id="qrTotalFee" style="font-size:28px;font-weight:800;color:#16a34a;"></div>
+              <div id="qrFeeDetail" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
             </div>
-          </form>
+            <img id="qrImage" src="" alt="QR chuyển khoản"
+              style="max-width:220px;width:100%;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);margin-bottom:16px;">
+            <div style="background:#f9fafb;border-radius:10px;padding:12px 16px;text-align:left;font-size:13px;">
+              <div style="margin-bottom:4px;"><span style="color:#9ca3af;">Ngân hàng:</span> <strong>MB Bank</strong></div>
+              <div style="margin-bottom:4px;"><span style="color:#9ca3af;">Số tài khoản:</span> <strong id="qrAccount"></strong></div>
+              <div style="margin-bottom:4px;"><span style="color:#9ca3af;">Tên chủ TK:</span> <strong id="qrName"></strong></div>
+              <div><span style="color:#9ca3af;">Nội dung:</span> <strong id="qrContent" style="color:#8B0000;"></strong></div>
+            </div>
+            <div style="margin-top:14px;background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;">
+              ⏳ <strong>Chờ admin xác nhận</strong> sau khi bạn chuyển khoản (trong vòng 24h).
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='';">Quay lại</button>
+            <button type="button" class="btn btn-success" id="btnSubmitBorrow">
+              ✅ Đã chuyển khoản, gửi yêu cầu
+            </button>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-          <button type="button" class="btn btn-primary" id="confirmBorrowBtn">Xác nhận mượn</button>
-        </div>
+
       </div>
     </div>
   </div>
@@ -475,19 +505,6 @@
     </div>
   </footer>
 </html>
-<!-- Modal tìm kiếm bằng ảnh -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content p-4 text-center">
-      <h5 class="modal-title mb-3">Tìm kiếm sách bằng ảnh bìa</h5>
-      <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{% url 'upload_cover' %}">
-        {% csrf_token %}
-        <input type="file" name="image" id="imageInput" accept="image/*" class="form-control mb-3" required>
-        <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
-      </form>
-      <div id="resultArea" class="mt-3"></div>
-    </div>
-  </div>
-</div>
+
 
 

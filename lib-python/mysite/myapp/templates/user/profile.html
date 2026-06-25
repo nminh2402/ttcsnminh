@@ -148,9 +148,9 @@
       <ul class="menu">
         <li><a href="{% url 'home' %}">Trang chủ </a></li>
         <li>
-          <a href="#">Giới thiệu</a>
+          <a href="{% url 'intro' %}">Giới thiệu</a>
         </li>
-        <li><a href="#">Tin tức & Sự kiện</a></li>
+        <li><a href="https://ptit.edu.vn/tin-tuc-su-kien/tin-tuc/tin-tuc-chung/">Tin tức & Sự kiện</a></li>
         <li><a href="#">Liên hệ</a></li>
         <li>
           <a href="{% url 'logout' %}">Đăng Xuất</a>
@@ -182,7 +182,6 @@
                 
                 <div class="tabs">
                     <div class="tab active" data-tab="borrowed">Đang mượn</div>
-                    <div class="tab" data-tab="returned">Đã trả</div>
                     <div class="tab" data-tab="viewed">Đã xem</div>
                 </div>
                 
@@ -210,7 +209,17 @@
                                                 <span class="info-label">Ngày mượn:</span>
                                                 <span class="info-value">{{ record.borrowed_at|date:"d/m/Y" }}</span>
                                             </div>
-                                            {% if record.book.pdf_file %}
+                                            <div class="borrowed-book-info mb-1">
+                                                <span class="info-label">Trạng thái:</span>
+                                                {% if record.status == 'pending' %}
+                                                <span class="badge bg-warning text-dark" style="font-size:11px;">Chờ duyệt</span>
+                                                {% elif record.status == 'approved' %}
+                                                <span class="badge bg-success" style="font-size:11px;">Đã duyệt</span>
+                                                {% else %}
+                                                <span class="badge bg-secondary" style="font-size:11px;">{{ record.get_status_display }}</span>
+                                                {% endif %}
+                                            </div>
+                                            {% if record.status == 'approved' and record.book.pdf_file %}
                                             <a href="{{ record.book.pdf_file.url }}" target="_blank"
                                                style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;
                                                       padding:5px 10px;background:#8B0000;color:#fff;
@@ -226,6 +235,10 @@
                                                 </svg>
                                                 Đọc PDF
                                             </a>
+                                            {% elif record.status != 'approved' %}
+                                            <div style="font-size:11px;color:#6c757d;margin-top:8px;">
+                                                ⏳ PDF sẽ mở khi được duyệt.
+                                            </div>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -239,45 +252,7 @@
                         </div>
                     {% endif %}
                 </div>
-                
-                <div id="returned" class="tab-content">
-                    {% if returned_books %}
-                        <div class="book-slider-container">
-                            <div class="book-slider">
-                                {% for record in returned_books %}
-                                <div class="card borrowed-book-card border-0 shadow-sm p-3" style="border-radius: 12px; background-color: #f8f9fa;">
-                                    <div class="book-cover-container">
-                                        {% if record.book.image %}
-                                        <img src="{{ record.book.image.url }}" alt="Bìa sách" class="book-cover">
-                                        {% else %}
-                                        <img src="{% static 'images/default-book-cover.jpg' %}" alt="Bìa sách mặc định" class="book-cover">
-                                        {% endif %}
-                                    </div>
-                                    <div class="book-info">
-                                        <h5 class="book-title">{{ record.book.title }}</h5>
-                                        <div class="borrowed-book-info mb-1">
-                                            <span class="info-label">Tác giả:</span>
-                                            <span class="info-value">{{ record.book.author }}</span>
-                                        </div>
-                                        <div class="borrowed-book-info mb-1">
-                                            <span class="info-label">Ngày mượn:</span>
-                                            <span class="info-value">{{ record.borrowed_at|date:"d/m/Y" }}</span>
-                                        </div>
-                                        <div class="borrowed-book-info mb-1">
-                                            <span class="info-label">Ngày trả:</span>
-                                            <span class="info-value">{{ record.returned_at|date:"d/m/Y" }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-secondary text-center" role="alert">
-                            <i class="bi bi-book"></i> Bạn chưa trả sách nào.
-                        </div>
-                    {% endif %}
-                </div>
+
 
                 
                 <div id="viewed" class="tab-content">

@@ -13,6 +13,29 @@
     />
     <title>PTIT ELIB</title>
     <link rel="stylesheet" href="{% static 'css/book.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+      .review-section { max-width: 860px; margin: 32px auto; padding: 0 16px; }
+      .review-section h2 { font-size: 22px; font-weight: 700; color: #1a1a2e; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; }
+      .avg-rating-box { background: linear-gradient(135deg,#8B0000,#c0392b); color:#fff; border-radius: 16px; padding: 24px 32px; display:flex; align-items:center; gap:24px; margin-bottom:28px; }
+      .avg-number { font-size: 52px; font-weight: 800; line-height: 1; }
+      .avg-stars { font-size: 22px; color: #fbbf24; }
+      .avg-count { font-size: 14px; opacity: .85; margin-top: 4px; }
+      .review-form-card { background:#fff; border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,.08); padding:24px; margin-bottom:28px; border: 1px solid #f0f0f0; }
+      .review-form-card h3 { font-size:17px; font-weight:700; color:#1f2937; margin-bottom:16px; }
+      .star-rating { display:flex; gap:6px; margin-bottom:16px; flex-direction:row-reverse; justify-content:flex-end; }
+      .star-rating input { display:none; }
+      .star-rating label { font-size:32px; color:#d1d5db; cursor:pointer; transition:color .15s; }
+      .star-rating label:hover, .star-rating label:hover ~ label,
+      .star-rating input:checked ~ label { color:#fbbf24; }
+      .review-card { background:#fff; border-radius:12px; padding:18px 20px; margin-bottom:14px; box-shadow:0 2px 8px rgba(0,0,0,.06); border:1px solid #f0f0f0; }
+      .reviewer-name { font-weight:700; color:#1f2937; }
+      .review-date { font-size:12px; color:#9ca3af; }
+      .review-stars { color:#fbbf24; font-size:15px; }
+      .my-review-badge { background:#fef3c7; color:#d97706; border-radius:8px; padding:2px 8px; font-size:11px; font-weight:700; margin-left:8px; }
+      .book-category-badge { display:inline-block; background:#eff6ff; color:#2563eb; border-radius:8px; padding:3px 10px; font-size:12px; font-weight:600; margin-bottom:8px; }
+      .book-description { background:#f9fafb; border-radius:10px; padding:14px 16px; color:#374151; font-size:14px; line-height:1.7; margin-top:10px; border-left:3px solid #8B0000; }
+    </style>
   </head>
   <body>
     <!-- Header Top -->
@@ -44,9 +67,9 @@
       <ul class="menu">
         <li><a href="{% url 'home' %}">Trang chủ </a></li>
         <li>
-          <a href="#">Giới thiệu</a>
+          <a href="{% url 'intro' %}">Giới thiệu</a>
         </li>
-        <li><a href="#">Tin tức & Sự kiện</a></li>
+        <li><a href="https://ptit.edu.vn/tin-tuc-su-kien/tin-tuc/tin-tuc-chung/">Tin tức & Sự kiện</a></li>
         <li><a href="#">Liên hệ</a></li>
         <li>
           <a href="{% url 'logout' %}">Đăng Xuất</a>
@@ -69,19 +92,47 @@
           {% endif %}
           </div>
           <div class="details">
-          <p><strong>Title:</strong> {{ book.title }}</p>
-          <p><strong>Authors:</strong> {{ book.author }}</p>
-          <p><strong>Publisher:</strong> {{ book.publisher }}</p>
-          {% if is_borrowed %}
-          <p id="book-pdf-link"><strong>Đọc online:</strong> <a href="{{ book.uri }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="bi bi-file-earmark-pdf-fill me-1"></i> Xem PDF</a></p>
+          <p><strong>Tên sách:</strong> {{ book.title }}</p>
+          <p><strong>Tác giả:</strong> {{ book.author }}</p>
+          <p><strong>Nhà xuất bản:</strong> {{ book.publisher }}</p>
+          {% if book.category %}
+          <p><strong>Thể loại:</strong> <span class="book-category-badge">{{ book.get_category_display }}</span></p>
           {% endif %}
-          {% if not is_borrowed %}
-          <p id="book-pdf-link" style="display:none;"><strong>Đọc online:</strong> <a href="{{ book.uri }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="bi bi-file-earmark-pdf-fill me-1"></i> Xem PDF</a></p>
+          {% if book.description %}
+          <div class="book-description">{{ book.description }}</div>
+          {% endif %}
+          {% if review_count > 0 %}
+          <p style="margin-top:8px;">
+            <strong>Đánh giá:</strong>
+            {% for i in rating_range %}
+              {% if i <= avg_rating %}<i class="bi bi-star-fill" style="color:#fbbf24;"></i>
+              {% else %}<i class="bi bi-star" style="color:#d1d5db;"></i>
+              {% endif %}
+            {% endfor %}
+            <span style="font-size:13px;color:#6b7280;"> {{ avg_rating }}/5 ({{ review_count }} đánh giá)</span>
+          </p>
+          {% endif %}
+          {% if borrow_status == 'approved' %}
+            {% if book.pdf_file %}
+              <p id="book-pdf-link"><strong>Đọc online:</strong> <a href="{{ book.pdf_file.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="bi bi-file-earmark-pdf-fill me-1"></i> Xem PDF</a></p>
+            {% elif book.uri %}
+              <p id="book-pdf-link"><strong>Đọc online:</strong> <a href="{{ book.uri }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="bi bi-file-earmark-pdf-fill me-1"></i> Xem PDF</a></p>
+            {% endif %}
+          {% else %}
+            {% if book.pdf_file %}
+              <p id="book-pdf-link" style="display:none;"><strong>Đọc online:</strong> <a href="{{ book.pdf_file.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="bi bi-file-earmark-pdf-fill me-1"></i> Xem PDF</a></p>
+            {% elif book.uri %}
+              <p id="book-pdf-link" style="display:none;"><strong>Đọc online:</strong> <a href="{{ book.uri }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger rounded-pill px-3"><i class="bi bi-file-earmark-pdf-fill me-1"></i> Xem PDF</a></p>
+            {% endif %}
           {% endif %}
           <div class="book-overlay">
-              {% if is_borrowed %}
+              {% if borrow_status == 'approved' %}
                 <button class="btn-view disabled" disabled>
                   <i class="bi bi-check-circle"></i> Đã Mượn
+                </button>
+              {% elif borrow_status == 'pending' %}
+                <button class="btn-view disabled" disabled>
+                  <i class="bi bi-hourglass-split"></i> Chờ duyệt
                 </button>
               {% else %}
                 <button class="btn-view" onclick="openBorrowModal({{ book.id }}, this)">
@@ -121,31 +172,159 @@
       </div>
     </div>
 
-    <!-- Borrow Modal -->
+    <!-- Review Section -->
+    <div class="review-section">
+      <h2><i class="bi bi-chat-square-heart-fill" style="color:#8B0000;"></i> Đánh giá & Bình luận</h2>
+
+      <!-- Avg Rating Box -->
+      {% if review_count > 0 %}
+      <div class="avg-rating-box">
+        <div class="avg-number">{{ avg_rating }}</div>
+        <div>
+          <div class="avg-stars">
+            {% for i in rating_range %}
+              {% if i <= avg_rating %}<i class="bi bi-star-fill"></i>
+              {% else %}<i class="bi bi-star"></i>
+              {% endif %}
+            {% endfor %}
+          </div>
+          <div class="avg-count">{{ review_count }} lượt đánh giá</div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Form đánh giá -->
+      {% if request.user.is_authenticated %}
+        {% if user_review %}
+        <div class="review-form-card" style="border-left:4px solid #16a34a;">
+          <h3>✅ Bạn đã đánh giá cuốn sách này</h3>
+          <div class="review-stars">
+            {% for i in rating_range %}{% if i <= user_review.rating %}<i class="bi bi-star-fill"></i>{% else %}<i class="bi bi-star"></i>{% endif %}{% endfor %}
+          </div>
+          <p style="margin-top:8px;color:#374151;">{{ user_review.comment }}</p>
+        </div>
+        {% elif review_form %}
+        <div class="review-form-card">
+          <h3>✍️ Viết đánh giá của bạn</h3>
+          <form method="POST" action="{% url 'submit_review' book.id %}">
+            {% csrf_token %}
+            <div class="star-rating">
+              {% for i in "54321" %}
+              <input type="radio" name="rating" id="star{{ i }}" value="{{ i }}" {% if i == '5' %}required{% endif %}>
+              <label for="star{{ i }}">&#9733;</label>
+              {% endfor %}
+            </div>
+            <div class="mb-3">
+              {{ review_form.comment }}
+            </div>
+            <button type="submit" class="btn btn-danger px-4">
+              <i class="bi bi-send-fill me-1"></i> Gửi đánh giá
+            </button>
+          </form>
+        </div>
+        {% endif %}
+      {% else %}
+      <div class="review-form-card" style="text-align:center;">
+        <p style="color:#6b7280;">Vui lòng <a href="{% url 'login' %}" style="color:#8B0000;font-weight:700;">đăng nhập</a> để đánh giá sách.</p>
+      </div>
+      {% endif %}
+
+      <!-- Danh sách đánh giá -->
+      {% if reviews %}
+      <h3 style="font-size:17px;font-weight:700;color:#1f2937;margin-bottom:14px;">Tất cả đánh giá ({{ review_count }})</h3>
+      {% for review in reviews %}
+      <div class="review-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div>
+            <span class="reviewer-name">{{ review.user.username }}</span>
+            {% if review.user == request.user %}<span class="my-review-badge">Của bạn</span>{% endif %}
+            <div class="review-stars">
+              {% for i in rating_range %}{% if i <= review.rating %}<i class="bi bi-star-fill"></i>{% else %}<i class="bi bi-star"></i>{% endif %}{% endfor %}
+            </div>
+          </div>
+          <span class="review-date">{{ review.created_at|date:"d/m/Y H:i" }}</span>
+        </div>
+        {% if review.comment %}<p style="color:#374151;font-size:14px;margin:0;">{{ review.comment }}</p>{% endif %}
+      </div>
+      {% endfor %}
+      {% else %}
+      <div style="text-align:center;padding:32px;color:#9ca3af;">
+        <i class="bi bi-chat-dots" style="font-size:40px;display:block;margin-bottom:12px;"></i>
+        Chưa có đánh giá nào. Hãy là người đầu tiên!
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Borrow Modal (2 bước) -->
     <div class="modal fade" id="borrowModal" tabindex="-1" aria-labelledby="borrowModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="borrowModalLabel">Thông tin mượn sách</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form id="borrowForm">
-              <input type="hidden" id="borrowBookId">
-              <div class="mb-3">
-                <label for="expectedReturnDate" class="form-label">Ngày dự kiến trả (*)</label>
-                <input type="date" class="form-control" id="expectedReturnDate" required>
+
+          <!-- Bước 1: Điền thông tin -->
+          <div id="step1">
+            <div class="modal-header" style="background:#8B0000;color:#fff;">
+              <h5 class="modal-title" id="borrowModalLabel">
+                📚 Bước 1: Thông tin mượn sách
+              </h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <form id="borrowForm">
+                <input type="hidden" id="borrowBookId">
+                <div class="mb-3">
+                  <label for="expectedReturnDate" class="form-label fw-semibold">Ngày dự kiến trả (*)</label>
+                  <input type="date" class="form-control" id="expectedReturnDate" required>
+                  <div id="feePreview" style="font-size:13px;color:#8B0000;margin-top:6px;font-weight:600;"></div>
+                </div>
+                <div class="mb-3">
+                  <label for="borrowNote" class="form-label fw-semibold">Ghi chú thêm</label>
+                  <textarea class="form-control" id="borrowNote" rows="3" placeholder="Mục đích mượn, tình trạng sách..."></textarea>
+                </div>
+              </form>
+              <div style="background:#fef3c7;border-radius:8px;padding:10px 14px;font-size:13px;color:#92400e;">
+                ⚠️ <strong>Phí mượn:</strong> 3.000 VND / ngày. Vui lòng chuyển khoản sau khi gửi yêu cầu.
               </div>
-              <div class="mb-3">
-                <label for="borrowNote" class="form-label">Ghi chú thêm</label>
-                <textarea class="form-control" id="borrowNote" rows="3" placeholder="Mục đích mượn, tình trạng sách..."></textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+              <button type="button" class="btn btn-danger" id="confirmBorrowBtn">
+                Tiếp theo → Thanh toán
+              </button>
+            </div>
+          </div>
+
+          <!-- Bước 2: QR chuyển tiền -->
+          <div id="step2" style="display:none;">
+            <div class="modal-header" style="background:#16a34a;color:#fff;">
+              <h5 class="modal-title">✅ Bước 2: Thanh toán phí mượn sách</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="text-align:center;padding:24px 20px;">
+              <div style="background:#f0fdf4;border-radius:12px;padding:16px;margin-bottom:16px;">
+                <div style="font-size:13px;color:#6b7280;margin-bottom:4px;">Tổng phí mượn</div>
+                <div id="qrTotalFee" style="font-size:28px;font-weight:800;color:#16a34a;"></div>
+                <div id="qrFeeDetail" style="font-size:12px;color:#9ca3af;margin-top:2px;"></div>
               </div>
-            </form>
+              <img id="qrImage" src="" alt="QR chuyển khoản"
+                style="max-width:220px;width:100%;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);margin-bottom:16px;">
+              <div style="background:#f9fafb;border-radius:10px;padding:12px 16px;text-align:left;font-size:13px;">
+                <div style="margin-bottom:4px;"><span style="color:#9ca3af;">Ngân hàng:</span> <strong>MB Bank</strong></div>
+                <div style="margin-bottom:4px;"><span style="color:#9ca3af;">Số tài khoản:</span> <strong id="qrAccount"></strong></div>
+                <div style="margin-bottom:4px;"><span style="color:#9ca3af;">Tên chủ TK:</span> <strong id="qrName"></strong></div>
+                <div><span style="color:#9ca3af;">Nội dung:</span> <strong id="qrContent" style="color:#8B0000;"></strong></div>
+              </div>
+              <div style="margin-top:14px;background:#fef2f2;border-radius:8px;padding:10px 14px;font-size:13px;color:#dc2626;">
+                ⏳ <strong>Chờ admin xác nhận</strong> sau khi bạn chuyển khoản (trong vòng 24h).
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" onclick="document.getElementById('step2').style.display='none';document.getElementById('step1').style.display='';">Quay lại</button>
+              <button type="button" class="btn btn-success" id="btnSubmitBorrow">
+                ✅ Đã chuyển khoản, gửi yêu cầu
+              </button>
+            </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-            <button type="button" class="btn btn-primary" id="confirmBorrowBtn">Xác nhận mượn</button>
-          </div>
+
         </div>
       </div>
     </div>
@@ -235,59 +414,123 @@ function openBorrowModal(bookId, button) {
   document.getElementById('borrowBookId').value = bookId;
   document.getElementById('expectedReturnDate').value = '';
   document.getElementById('borrowNote').value = '';
+  document.getElementById('feePreview').textContent = '';
+  document.getElementById('step1').style.display = '';
+  document.getElementById('step2').style.display = 'none';
   currentBorrowButton = button;
-  
-  var borrowModal = new bootstrap.Modal(document.getElementById('borrowModal'));
-  borrowModal.show();
+  new bootstrap.Modal(document.getElementById('borrowModal')).show();
 }
 
+// Phí preview khi chọn ngày
 document.addEventListener('DOMContentLoaded', function() {
+  const dateInput = document.getElementById('expectedReturnDate');
+  if (dateInput) {
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.min = today;
+    dateInput.addEventListener('change', function() {
+      const d = new Date(this.value);
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const days = Math.round((d - now) / 86400000);
+      const fee = days > 0 ? days * 3000 : 0;
+      const preview = document.getElementById('feePreview');
+      if (preview) {
+        preview.textContent = days > 0
+          ? `Ước tính: ${days} ngày × 3.000 VND = ${fee.toLocaleString('vi-VN')} VND`
+          : '';
+      }
+    });
+  }
+
   const confirmBtn = document.getElementById('confirmBorrowBtn');
+  const submitBtn = document.getElementById('btnSubmitBorrow');
+  let currentExpectedDate = '';
+  let currentNote = '';
+  let currentFee = 0;
+  let currentDays = 0;
+
   if (confirmBtn) {
     confirmBtn.addEventListener('click', function() {
-      const bookId = document.getElementById('borrowBookId').value;
       const expectedDate = document.getElementById('expectedReturnDate').value;
       const note = document.getElementById('borrowNote').value;
-      
+
       if (!expectedDate) {
-        alert("Vui lòng chọn ngày dự kiến trả!");
+        alert('Vui lòng chọn ngày dự kiến trả!');
         return;
       }
+
+      const d = new Date(expectedDate);
+      const now = new Date();
+      now.setHours(0,0,0,0);
+      const days = Math.round((d - now) / 86400000);
       
+      if (days <= 0) {
+        alert('Ngày dự kiến trả phải lớn hơn ngày hiện tại!');
+        return;
+      }
+
+      currentExpectedDate = expectedDate;
+      currentNote = note;
+      currentDays = days;
+      currentFee = days * 3000;
+
+      // Tính QR code frontend
+      const bank_id = "MB";
+      const account_no = "0774504240205";
+      const account_name = "LE NGUYEN NHAT MINH";
+      const bookTitle = "{{ book.title|escapejs }}";
+      const addInfo = "Muon sach " + bookTitle.substring(0, 20);
+      const qr_url = `https://img.vietqr.io/image/${bank_id}-${account_no}-compact2.jpg?amount=${currentFee}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(account_name)}`;
+
+      // Ẩn bước 1, hiện bước 2
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step2').style.display = '';
+
+      // Điền thông tin QR
+      document.getElementById('qrImage').src = qr_url;
+      document.getElementById('qrTotalFee').textContent = currentFee.toLocaleString('vi-VN') + ' VND';
+      document.getElementById('qrFeeDetail').textContent = `${days} ngày × 3.000 VND/ngày`;
+      document.getElementById('qrAccount').textContent = account_no;
+      document.getElementById('qrName').textContent    = account_name;
+      document.getElementById('qrContent').textContent = addInfo;
+    });
+  }
+
+  if (submitBtn) {
+    submitBtn.addEventListener('click', function() {
+      const bookId = document.getElementById('borrowBookId').value;
+      
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Đang gửi...';
+
       fetch(`/book/${bookId}/borrow/`, {
         method: 'POST',
         headers: {
           'X-CSRFToken': getCookie('csrftoken'),
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          expected_return_date: expectedDate,
-          note: note
-        })
+        body: JSON.stringify({ expected_return_date: currentExpectedDate, note: currentNote })
       })
-      .then(response => response.json())
+      .then(r => r.json())
       .then(data => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '✅ Đã chuyển khoản, gửi yêu cầu';
+
         if (data.success) {
+          bootstrap.Modal.getInstance(document.getElementById('borrowModal')).hide();
+          
           if (currentBorrowButton) {
-            currentBorrowButton.outerHTML = `
-              <button class="btn-view disabled" disabled>
-                <i class="bi bi-book"></i> Đã Mượn
-              </button>`;
+            currentBorrowButton.outerHTML = `<button class="btn-view disabled" disabled>⏳ Chờ duyệt</button>`;
           }
-          var modalEl = document.getElementById('borrowModal');
-          var modal = bootstrap.Modal.getInstance(modalEl);
-          modal.hide();
-          alert("Mượn sách thành công!");
-          // Hiện link PDF sau khi mượn thành công
-          var pdfLink = document.getElementById('book-pdf-link');
-          if (pdfLink) { pdfLink.style.display = ''; }
+          alert('Đã gửi yêu cầu mượn sách. Vui lòng chờ admin duyệt!');
         } else {
           alert(data.message);
         }
       })
-      .catch(error => {
-        console.error('Lỗi:', error);
-        alert('Đã xảy ra lỗi khi mượn sách.');
+      .catch(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '✅ Đã chuyển khoản, gửi yêu cầu';
+        alert('Đã xảy ra lỗi, vui lòng thử lại.');
       });
     });
   }
