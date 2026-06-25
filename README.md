@@ -15,7 +15,6 @@
 - **Quản lý người dùng**: Đăng ký, đăng nhập và quản lý tài khoản người dùng.
 - **Giao diện thân thiện**: Thiết kế hiện đại, hỗ trợ đa ngôn ngữ (VI/EN).
 - **Tin tức & Sự kiện**: Cập nhật các tin tức và sự kiện liên quan đến thư viện.
-- **Tìm kiếm bằng ảnh**: Cho phép người dùng tìm kiếm sách bằng cách upload ảnh bìa.
 
 ## Công Nghệ Sử Dụng
 
