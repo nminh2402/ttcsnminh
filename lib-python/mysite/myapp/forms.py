@@ -26,7 +26,7 @@ class UserUpdateForm(forms.ModelForm):
 class BookForm(forms.ModelForm):
     class Meta:
         model = Book
-        fields = ['title', 'author', 'publisher', 'category', 'description', 'uri', 'image', 'pdf_file', 'quantity']
+        fields = ['title', 'author', 'publisher', 'category', 'description', 'uri', 'image', 'pdf_file']
         labels = {
             'title': 'Tên sách',
             'author': 'Tác giả',
@@ -36,7 +36,6 @@ class BookForm(forms.ModelForm):
             'uri': 'Link đọc online (URL)',
             'image': 'Ảnh bìa',
             'pdf_file': 'File sách (PDF)',
-            'quantity': 'Số lượng',
         }
         widgets = {
             'title':       forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nhập tên sách'}),
@@ -45,7 +44,6 @@ class BookForm(forms.ModelForm):
             'category':    forms.Select(attrs={'class': 'form-select'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Mô tả ngắn về sách...'}),
             'uri':         forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://...'}),
-            'quantity':    forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
         }
 
 

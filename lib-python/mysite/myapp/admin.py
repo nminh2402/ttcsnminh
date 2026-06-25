@@ -3,7 +3,7 @@ from .models import Book, UserHistory, BorrowRecord, BookReview
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'publisher', 'quantity', 'uri', 'has_pdf')
+    list_display = ('title', 'author', 'publisher', 'uri', 'has_pdf')
     search_fields = ('title', 'author', 'publisher')
     list_filter = ('author', 'publisher')
 

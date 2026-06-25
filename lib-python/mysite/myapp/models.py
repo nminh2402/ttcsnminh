@@ -30,7 +30,6 @@ class Book(models.Model):
     uri = models.URLField(blank=True, null=True)
     image = models.ImageField(upload_to='book_images/', null=True, blank=True)
     pdf_file = models.FileField(upload_to='book_pdfs/', null=True, blank=True)
-    quantity = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return self.title

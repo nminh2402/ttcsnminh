@@ -826,16 +826,6 @@
                 <div class="form-error" id="err_publisher"></div>
               </div>
               <div class="form-group">
-                <label>Số lượng</label>
-                <input
-                  type="number"
-                  name="quantity"
-                  id="f_quantity"
-                  value="1"
-                  min="0"
-                />
-              </div>
-              <div class="form-group">
                 <label>Thể loại</label>
                 <select name="category" id="f_category">
                   <option value="cong_nghe">Công nghệ - CNTT</option>
@@ -1061,7 +1051,6 @@
         ["f_title", "f_author", "f_publisher", "f_uri"].forEach(
           (id) => (document.getElementById(id).value = ""),
         );
-        document.getElementById("f_quantity").value = 1;
         document.getElementById("f_image").value = "";
         document.getElementById("cur_image").innerHTML = "";
         document.getElementById("f_pdf_file").value = "";
@@ -1084,7 +1073,6 @@
             document.getElementById("f_author").value = data.author;
             document.getElementById("f_publisher").value = data.publisher;
             document.getElementById("f_uri").value = data.uri;
-            document.getElementById("f_quantity").value = data.quantity;
             if (document.getElementById("f_category"))
               document.getElementById("f_category").value =
                 data.category || "khac";

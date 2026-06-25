@@ -514,7 +514,6 @@ def edit_book(request, book_id):
             'category': book.category,
             'description': book.description or '',
             'uri': book.uri or '',
-            'quantity': book.quantity,
             'image_url': book.image.url if book.image else '',
             'pdf_url': book.pdf_file.url if book.pdf_file else '',
         }
