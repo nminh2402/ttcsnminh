@@ -99,6 +99,16 @@ class BorrowRecord(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.book.title}"
 
+    @property
+    def estimated_fee_formatted(self):
+        if self.expected_return_date and self.borrowed_at:
+            days = (self.expected_return_date - self.borrowed_at.date()).days
+            if days <= 0:
+                days = 0
+            fee = days * 3000
+            return f"{fee:,}".replace(",", ".")
+        return "0"
+
     def is_borrowed(self):
         return self.returned_at is None and self.status == 'approved'
 

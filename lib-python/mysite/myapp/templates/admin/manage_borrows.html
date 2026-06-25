@@ -176,12 +176,8 @@
             </td>
             <td>
               {% if rec.expected_return_date %}
-              {% widthratio rec.borrowed_at|timesince:rec.expected_return_date 1 3000 as fee %}
               <span class="fee-tag">
-                {% if rec.expected_return_date %}
-                  {% now "Y-m-d" as today %}
-                  Xem thông tin
-                {% endif %}
+                {{ rec.estimated_fee_formatted }} VNĐ
               </span>
               {% else %}—{% endif %}
             </td>
